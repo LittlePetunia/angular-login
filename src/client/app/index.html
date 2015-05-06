@@ -1,0 +1,52 @@
+<!-- public/ang/app.html -->
+<!-- ng-strict-di -->
+<!doctype html>
+
+<html lang="en" ng-app="app" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css" >
+  <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap-theme.css">
+
+  <link rel="stylesheet" href="/content/app-style.css">
+
+  <!-- Is this line doing anything? -->
+  <link rel="icon" href="/content/img/favicon.ico" type="image/x-icon" />
+
+  <title ng-bind="title"></title>
+</head>
+
+<body>
+
+  <div ui-view="top-nav"></div>
+
+  <!-- <h1>Angular Index.html</h1> -->
+
+
+  <!-- renders partial selected by controller -->
+  <div ui-view="main-content"></div>
+
+  <!-- placed at end of document so document loads faster -->
+  <!-- jquery has to be before bootstrap -->
+  <script src="/bower_components/jquery/dist/jquery.js" ></script>
+  <script src="/bower_components/bootstrap/dist/js/bootstrap.js" ></script>
+
+  <!-- NOTE: when adding something here, consider adding it to the karma.config -->
+  <script src="/bower_components/angular/angular.js" ></script>
+  <script src="/bower_components/angular-ui-router/release/angular-ui-router.js" ></script>
+  <script src="/bower_components/angular-resource/angular-resource.js" ></script>
+  <script src="/bower_components/moment/moment.js" ></script>
+
+  <!-- app angular scripts -->
+  <!-- I read you should import modules first. ?even though they might depend on services not loaded yet? -->
+  <script src="/app/app.module.js" ></script>
+  <script src="/app/app.routes.js" ></script>
+
+
+
+
+</body>
+
+</html>

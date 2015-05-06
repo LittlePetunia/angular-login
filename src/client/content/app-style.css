@@ -1,0 +1,7 @@
+/*a.link{
+  cursor:pointer;
+}*/
+
+body>div[ui-view="main-content"]{
+  padding:13px;
+}

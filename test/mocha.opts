@@ -1,0 +1,7 @@
+src/server/test/e2e
+--reporter spec
+--growl
+--recursive
+--watch
+--watch-extensions ['*.js']
+--no-colors

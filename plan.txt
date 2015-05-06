@@ -1,0 +1,60 @@
+// Plan :
+
+
+Render tabs from metadata. Later we will get this from some 'provider?'.
+
+Unit test the tabs element is active after selecting the tab.
+
+e2e test the page url is as expected after clicking the tab link.
+
+
+
+Create todo page
+
+  save/read todo data to a file for now.
+  use some data provider for this then we can switch out the providers later.
+
+  unit test
+    adding a new todo
+    reading the todos.
+
+  e2e test
+    reading the todos:
+      values show in fields as expected
+    updating todos
+      after updating todo in ui and submitting
+      ui shows updated value
+    deleting todos
+      after deleting a todo
+      it no longer shows in ui (but remaining todos are shown)
+
+<div class="collapse navbar-collapse" id="navbar-collapse">
+  <ul class="nav navbar-nav">
+    <li ng-repeat"tab in vm.tabs" ng-class="{active: vm.isSelected(tab)}">
+      <a ui-sref="{{tab.sref}}">{{tab.text}}</a></li>
+
+  </ul>
+</div>
+
+<li class="dropdown">
+  <!-- data-toggle:dropdown says what to do when clicked. -->
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+    <!-- not sure what caret is doing here -->
+    <!-- !! it is the down arrow symbol :) -->
+    Tech <b class="caret"></b>
+  </a>
+  <ul class="dropdown-menu">
+    <li class="dropdown-header">Main</li>
+    <li><a href="#">Bootstrap</a></li>
+    <li><a href="#">AngularJS</a></li>
+    <li><a href="#">NodeJS</a></li>
+    <li><a href="#">Mongo</a></li>
+    <li class="divider"><li>
+    <li class="dropdown-header">Misc</li>
+    <li><a href="#">Jasmine</a></li>
+    <li><a href="#">Mocha</a></li>
+    <li><a href="#">Karma</a></li>
+    <li><a href="#">Protractor</a></li>
+    <li><a href="#">Grunt/Grub</a></li>
+  </ul>
+</li>
