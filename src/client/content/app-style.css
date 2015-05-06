@@ -2,6 +2,15 @@
   cursor:pointer;
 }*/
 
-body>div[ui-view="main-content"]{
-  padding:13px;
+body>div[ui-view="main-content"] {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+div.form-container-med {
+  width: 800px;
+}
+
+div.form-button-row {
+  margin-top: 40px;
 }

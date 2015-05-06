@@ -1,30 +1,50 @@
+<div class="alert alert-danger alert-dismissible" ng-show="vm.errorMessage != null">
+  <button type="button" class="close" data-dismiss="alert" ng-click="vm.clearErrorMessage()">
+    <span>&times;</span>
+  </button>
+  <span> {{vm.errorMessage}}</span>
+</div>
+<h3>New User Registration</h3>
 
-<h2>New User Registration</h2>
+<br/>
+<div class="form-container-med">
+  <form name="form" ng-submit="vm.userSubmit(vm.user)" class="form form-horizontal">
 
-<form>
-  <div class="form-group">
-    <label for="userName">UserName</label>
-    <input type="text" class="form-control" id="userName" placeholder="UserName" required>
-  </div>
+    <div class="form-group">
+      <label for="userName" class="col-sm-2 control-label">User Name</label>
+      <div class="col-sm-6">
+        <input ng-model="vm.form.userName" class="form-control" id="userName" placeholder="User Name" required type="text"> </div>
+    </div>
 
-  <div class="form-group">
-    <label for="password">Password</label>
-    <input type="password" class="form-control" id="password" placeholder="Password" require>
-  </div>
+    <div class="form-group">
+      <label for="password" class="col-sm-2 control-label">Password</label>
+      <div class="col-sm-6">
+        <input ng-model="vm.form.password" class="form-control" id="password" placeholder="Password" required type="password"> </div>
+    </div>
 
-  <div class="form-group">
-    <label for="emailAddress">Email</label>
-    <input type="email" class="form-control" id="emailAddress" placeholder="Email Address" require>
-  </div>
+    <div class="form-group">
+      <label for="emailAddress" class="col-sm-2 control-label">Email</label>
+      <div class="col-sm-6">
+        <input ng-model="vm.form.emailAddress" class="form-control" id="emailAddress" placeholder="Email Address" required type="email"> </div>
+    </div>
 
-  <div class="form-group">
-    <label for="firstName">First Name</label>
-    <input type="text" class="form-control" id="firstName" placeholder="First Name" required>
-  </div>
+    <div class="form-group">
+      <label for="firstName" class="col-sm-2 control-label">First Name</label>
+      <div class="col-sm-6">
+        <input ng-model="vm.form.firstName" class="form-control" id="firstName" placeholder="First Name" required type="text"> </div>
+    </div>
 
-  <div class="form-group">
-    <label for="lastName">Last Name</label>
-    <input type="text" class="form-control" id="lastName" placeholder="Last Name" required>
-  </div>
+    <div class="form-group">
+      <label for="lastName" class="col-sm-2 control-label">Last Name</label>
+      <div class="col-sm-6">
+        <input ng-model="vm.form.lastName" class="form-control" id="lastName" placeholder="Last Name" required type="text"> </div>
+    </div>
 
-</form>
+    <div class="form-group form-button-row">
+      <div class="col-sm-offset-2 col-sm-6">
+        <button type="button" class="btn btn-danger ">Cancel</button>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </div>
+    </div>
+  </form>
+</div>
