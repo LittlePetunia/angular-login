@@ -4,8 +4,8 @@
   angular.module('app')
     .controller('RegisterCtrl', RegisterCtrl);
 
-
   RegisterCtrl.$inject = ['$rootScope'];
+
   function RegisterCtrl($rootScope) {
 
     $rootScope.title = 'Register';
@@ -16,7 +16,11 @@
     vm.errorMessage = null;
 
     // functions for collecting form data and submitting new user info
-    function submitUser(user) {}
+    function submitUser(user) {
+
+      console.log('userSubmit called');
+      vm.errorMessage = 'userSubmit called';
+    }
 
     function clearErrorMessage() {
       vm.errorMessage = null;

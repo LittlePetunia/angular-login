@@ -14,3 +14,16 @@ div.form-container-med {
 div.form-button-row {
   margin-top: 40px;
 }
+
+div.invalid-message {
+  margin-top: 5px;
+}
+
+div.invalid-message>span {
+  position: relative;
+  color: #a94442;
+}
+
+.form.ng-submitted .ng-invalid,.ng-invalid.ng-touched {
+  border-color: #a94442
+}
