@@ -43,8 +43,8 @@ router.delete('/users/:userId', function (req, res, next) {
 
   var userId = req.params.userId;
 
-  User.deleteById(userId)
-    .then(onSuccess(200, res), onError(500, res));
+  User.deleteById(userId) //204 No Content
+    .then(onSuccess(204, res), onError(500, res));
 });
 
 // PUT
@@ -57,7 +57,9 @@ router.put('/users/:userId', function (req, res, next) {
     user._id = userId;
   } else if (user._id.toString() !== userId.toString()) {
     return res.status(422) //422 Unprocessable Entity
-      .json('id of object does not match id in path.' + ' object _id: ' + user._id + ' path id: ' + userId);
+      .json({
+        message: 'id of object does not match id in path.' + ' object _id: ' + user._id + ' path id: ' + userId
+      });
   }
 
   User.update(user)
@@ -78,10 +80,10 @@ function onError(code, res) {
     var msg = err.message || err;
     var errors = JSON.stringify(err.errors || []);
 
-    console.log('log code: ' + code);
-    console.log('log name: ' + name);
-    console.log('log msg: ' + msg);
-    console.log('log errors: ' + errors);
+    // console.log('log code: ' + code);
+    // console.log('log name: ' + name);
+    // console.log('log msg: ' + msg);
+    // console.log('log errors: ' + errors);
 
     // console.log('log status: ' + code);
     return res.status(code)

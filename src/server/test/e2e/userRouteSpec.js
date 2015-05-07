@@ -117,8 +117,29 @@ describe('User route', function () {
   });
 
   describe('GET /users', function () {
-    xit('should get all users', function (done) {
+    it('should get all users', function (done) {
+      // add 1 user then get should return 2 users
+      var newUser = {
+        userName: 'testUser2',
+        password: 'hellokitty2',
+        email: 'testuser2@mail.com',
+        firstName: 'test2',
+        lastName: 'user2'
+      };
 
+      request(app)
+        .post(urlHelper.post())
+        .send(newUser)
+        .end(function (err, res) {
+          expect(res.status).to.equal(201); //201 Created
+          request(app)
+            .get(urlHelper.get())
+            .end(function (err, res) {
+              expect(res.status).to.equal(200);
+              expect(res.body.length).to.equal(2);
+              done();
+            });
+        });
     });
   });
 
@@ -140,8 +161,7 @@ describe('User route', function () {
         .end(function (err, res) {
           expect(res.status).to.equal(404);
           expect(res.body).to.not.be.null;
-          expect(res.body.message).to.be.equal(
-            'User not found with id ' + fakeUserId);
+          expect(res.body.message).to.be.equal('User not found with id ' + fakeUserId);
           done();
         });
     });
@@ -163,8 +183,7 @@ describe('User route', function () {
         .send(newUser)
         .end(function (err, res) {
           expect(res.status).to.equal(201); //201 Created
-          expect(res.header.location).to.equal(path.join(
-            usersRootUri, res.body._id));
+          expect(res.header.location).to.equal(path.join(usersRootUri, res.body._id));
           expect(res.body.userName).to.be.equal(newUser.userName);
           expect(res.body._id).to.not.be.null;
           done();
@@ -178,8 +197,7 @@ describe('User route', function () {
         .end(function (err, res) {
           expect(res.status).to.equal(500);
           expect(res.body.name).to.equal('ValidationError');
-          expect(res.body.message).to.equal(
-            'User validation failed');
+          expect(res.body.message).to.equal('User validation failed');
           done();
         });
     });
@@ -212,264 +230,81 @@ describe('User route', function () {
   });
 
   describe('DELETE /users/:userId', function () {
-    xit('should delete a user', function (done) {
-      done();
+    it('should delete a user', function (done) {
+      request(app)
+        .delete(urlHelper.delete(user._id))
+        .end(function (err, res) {
+          expect(res.status).to.equal(204); //204 No Content
+          request(app)
+            .get(urlHelper.get(user._id))
+            .end(function (err, res) {
+              expect(res.status).to.equal(404);
+              done();
+            });
+        });
     });
 
-    xit(
-      'should return 400 error if user object id differs from url user id',
-      function (done) {
-        done();
-      });
-
-    xit('should return 400 error if user object has no id', function (done) {
-      done();
-    });
-
-    xit('should return 404 if user not found', function (done) {
-      done();
+    it('should return 404 if user not found', function (done) {
+      request(app)
+        .delete(urlHelper.delete(fakeUserId))
+        .end(function (err, res) {
+          expect(res.status).to.equal(404); //404 not found
+          done();
+        });
     });
   });
 
   describe('PUT /users/:userId', function () {
-    xit('should update a user', function (done) {
-      done();
+    it('should update a user', function (done) {
+
+      var updateUser = {
+        userName: 'testUser2',
+        password: 'hellokitty2',
+        email: 'testuser2@mail.com',
+        firstName: 'test2',
+        lastName: 'user2'
+      };
+
+      request(app)
+        .put(urlHelper.put(user._id))
+        .send(updateUser)
+        .end(function (err, res) {
+          expect(res.status).to.equal(200);
+          request(app)
+            .get(urlHelper.get(user._id))
+            .end(function (err, res) {
+              expect(res.status).to.equal(200);
+              expect(res.body._id.toString()).to.equal(user._id.toString());
+              expect(res.body.userName).to.be.equal(updateUser.userName);
+              expect(res.body.email).to.be.equal(updateUser.email);
+              expect(res.body.password).to.be.equal(updateUser.password);
+              expect(res.body.firstName).to.be.equal(updateUser.firstName);
+              expect(res.body.lastName).to.be.equal(updateUser.lastName);
+              done();
+            });
+        });
     });
 
-    xit(
-      'should return 400 error if user object id differs from url user id',
-      function (done) {
-        done();
-      });
-
-    xit('should return 400 error if user object has no id', function (done) {
-      done();
+    it('should return 422 error if user object id differs from url user id', function (done) {
+      request(app)
+        .put(urlHelper.put(fakeUserId))
+        .send(user)
+        .end(function (err, res) {
+          expect(res.status).to.equal(422); //422 Unprocessable Entity
+          expect(res.body.message).to.have.string('id of object does not match id in path.'); //422 Unprocessable Entity
+          done();
+        });
     });
 
-    xit('should return 404 if user not found', function (done) {
-      done();
+    it('should return 404 if user not found', function (done) {
+      user._id = fakeUserId;
+      request(app)
+        .put(urlHelper.put(fakeUserId))
+        .send(user)
+        .end(function (err, res) {
+          expect(res.status).to.equal(404); //422 Unprocessable Entity
+          done();
+        });
     });
   });
-
-  // xit('should create a user', function (done) {
-  //
-  // });
-
-  // it('should get all users for user #2', function(done){
-  //
-  //   request(app)
-  //     .get(urlHelper.get(todoData.userId2))
-  //     .expect(200)
-  //     .accept('json')
-  //     .end(function(err, res){
-  //       should.not.exist(err);
-  //       should.exist(res.body);
-  //       res.body.length.should.be.equal(3);
-  //       done();
-  //     });
-  // });
-
-  // it('should post a new todo for user #2', function(done){
-  //
-  //   // post
-  //   request(app)
-  //   .post(urlHelper.post(todoData.userId2))
-  //   .send({title:'new todo', notes: 'notes for new todo'})
-  //   .expect(201) // created
-  //   .accept('json')
-  //   .end(function(err, res){
-  //     should.not.exist(err);
-  //     should.exist(res.body);
-  //
-  //     // get
-  //     request(app)
-  //     .get(urlHelper.get(todoData.userId2))
-  //     .expect(200)
-  //     .accept('json')
-  //     .end(function(err, res){
-  //       should.not.exist(err);
-  //       should.exist(res.body);
-  //       res.body.length.should.be.equal(4);
-  //       done();
-  //     });
-  //   });
-  // });
-  //
-  // it('should return error when posting a todo with non-null todo.userId', function(done){
-  //
-  //   // post
-  //   request(app)
-  //   .post(urlHelper.post(todoData.userId2))
-  //   .send({_id: fakeUserId, title:'new todo', notes: 'notes for new todo'})
-  //   .expect(400) // bad request
-  //   .accept('json')
-  //   .end(function(err, res){
-  //     should.not.exist(err);
-  //     should.exist(res.body);
-  //
-  //     done();
-  //   });
-  // });
-  //
-  // it('should update a todo for user #2', function(done){
-  //
-  //   var newTitle = 'test #2.5';
-  //
-  //   request(app)
-  //     // get
-  //     .get(urlHelper.get(todoData.userId2))
-  //     .expect(200)
-  //     .accept('json')
-  //     .end(function(err, res){
-  //       should.not.exist(err);
-  //       should.exist(res.body);
-  //       res.body.length.should.be.equal(3);
-  //       var todoToUpdate = res.body[0];
-  //       todoToUpdate.title = newTitle;
-  //
-  //       // put
-  //       request(app)
-  //       .put(urlHelper.put(todoData.userId2, todoToUpdate._id))
-  //       .send(todoToUpdate)
-  //       .expect(200)
-  //       .accept('json')
-  //       .end(function(err, res){
-  //         should.not.exist(err);
-  //
-  //       // get
-  //       request(app)
-  //       .get(urlHelper.get(todoData.userId2))
-  //       .expect(200)
-  //       .accept('json')
-  //       .end(function(err, res){
-  //         should.not.exist(err);
-  //         should.exist(res.body);
-  //         var updatedUserArr = res.body.filter(function(val){
-  //           return val._id === todoToUpdate._id;
-  //         });
-  //         updatedUserArr.length.should.be.equal(1);
-  //         updatedUserArr[0].title.should.be.equal(newTitle);
-  //         done();
-  //       }); // end get 2
-  //     }); // end put
-  //   }); // end get 1
-  // });// end it
-  //
-  // it('should throw exception if attempt too update a todo with no userId for user #2', function(done){
-  //
-  //   request(app)
-  //     // get
-  //     .get(urlHelper.get(todoData.userId2))
-  //     .expect(200)
-  //     .accept('json')
-  //     .end(function(err, res){
-  //       should.not.exist(err);
-  //       should.exist(res.body);
-  //       res.body.length.should.be.equal(3);
-  //       var todoToUpdate = res.body[0];
-  //       var id = todoToUpdate._id;
-  //       todoToUpdate._id = null;
-  //
-  //       // put
-  //       request(app)
-  //       .put(urlHelper.put(todoData.userId2, id))
-  //       .send(todoToUpdate)
-  //       .expect(400)
-  //       .accept('json')
-  //       .end(function(err, res){
-  //         should.not.exist(err);
-  //
-  //         done();
-  //     }); // end put
-  //   }); // end get 1
-  // });// end it
-  //
-  // it('should return error when updating a todo with different userId than path userId', function(done){
-  //
-  //   request(app)
-  //     // get
-  //     .get(urlHelper.get(todoData.userId2))
-  //     .expect(200)
-  //     .accept('json')
-  //     .end(function(err, res){
-  //       should.not.exist(err);
-  //       should.exist(res.body);
-  //       res.body.length.should.be.equal(3);
-  //       var todoToUpdate = res.body[0];
-  //       var id = todoToUpdate._id;
-  //       todoToUpdate._id = fakeUserId;
-  //
-  //       // put
-  //       request(app)
-  //       .put(urlHelper.put(todoData.userId2, id))
-  //       .send(todoToUpdate)
-  //       .expect(400)
-  //       .accept('json')
-  //       .end(function(err, res){
-  //         should.not.exist(err);
-  //
-  //         done();
-  //     }); // end put
-  //   }); // end get 1
-  // });// end it
-  //
-  //
-  // it('should delete a todo for user #2', function(done){
-  //   request(app)
-  //     // get
-  //     .get(urlHelper.get(todoData.userId2))
-  //     .expect(200)
-  //     .accept('json')
-  //     .end(function(err, res){
-  //       should.not.exist(err);
-  //       should.exist(res.body);
-  //       res.body.length.should.be.equal(3);
-  //       var todoToDelete = res.body[0];
-  //
-  //       // delete
-  //       request(app)
-  //       .delete(urlHelper.put(todoData.userId2, todoToDelete._id))
-  //       .send(todoToDelete)
-  //       .expect(200)
-  //       .accept('json')
-  //       .end(function(err, res){
-  //         should.not.exist(err);
-  //
-  //         // get
-  //         request(app)
-  //         .get(urlHelper.get(todoData.userId2))
-  //         .expect(200)
-  //         .accept('json')
-  //         .end(function(err, res){
-  //           should.not.exist(err);
-  //           should.exist(res.body);
-  //           res.body.length.should.be.equal(2);
-  //
-  //           res.body.filter(function(val){
-  //             return val._id === todoToDelete._id;
-  //           })
-  //           .length.should.be.equal(0);
-  //
-  //           done();
-  //         }); // end get 2
-  //     }); // end delete
-  //   }); // end get 1
-  // });// end it
-  //
-  // it('should return error if attempt to delete a non-existent todo for user #2', function(done){
-  //
-  //   // delete
-  //   request(app)
-  //   .delete(urlHelper.put(todoData.userId2, fakeUserId))
-  //   .send()
-  //   .expect(404)
-  //   .accept('json')
-  //   .end(function(err, res){
-  //     should.not.exist(err);
-  //     // console.log(res.body);
-  //     should.exist(res.body);
-  //      res.body.message.should.equal('User not found with id ' + fakeUserId + ' for user ' + todoData.userId2);
-  //     done();
-  //   });
-  // });
 });
