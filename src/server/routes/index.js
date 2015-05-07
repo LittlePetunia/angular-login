@@ -1,15 +1,14 @@
-// routes/routes.js
+// routes/index.js
 
-module.exports = function(app) {
+module.exports = function (app) {
   'use strict';
 
   // mount todo routes on api
-  // app.use('/api', require('./api/todos.js'));
+  app.use('/api/', require('./api/users.js'));
 
   app.use('/', require('./ui/index.js'));
 
   // app.use('/users???', require('./users.js'));
-
 
   // error handling
   //

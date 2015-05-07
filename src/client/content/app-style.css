@@ -24,6 +24,6 @@ div.invalid-message>span {
   color: #a94442;
 }
 
-.form.ng-submitted .ng-invalid,.ng-invalid.ng-touched {
+.form.ng-submitted .ng-invalid, .ng-invalid.ng-touched {
   border-color: #a94442
 }

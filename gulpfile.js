@@ -12,8 +12,8 @@ var gulp = require('gulp'),
   jshint = require('gulp-jshint'),
   karma = require('karma').server,
   protractor = require('gulp-protractor').protractor,
-  browserSync = require('browser-sync');
-
+  browserSync = require('browser-sync'),
+  nodemon = require('gulp-nodemon');
 
 var filePaths = {
   appJS: 'public/ang/*.js',
@@ -22,7 +22,7 @@ var filePaths = {
 };
 
 // jshint
-gulp.task('jshint-run', function() {
+gulp.task('jshint-run', function () {
   return gulp.src('public/ang/**/*.js')
     .pipe(jshint('.jshintrc'))
     .pipe(jshint.reporter('jshint-stylish'));
@@ -32,27 +32,32 @@ gulp.task('jshint-run', function() {
 //   gulp.watch(filePaths.appJS, ['jshint-run']);
 // });
 
+gulp.task('serve-dev', function () {
+  serve({
+    mode: 'dev'
+  });
+});
 
 // karma
-gulp.task('karma-run', ['jshint-run'], function(done) {
+gulp.task('karma-run', ['jshint-run'], function (done) {
   karma.start({
     configFile: __dirname + '/karma.conf.js'
   }, done);
 });
 
-gulp.task('protractor-run', ['jshint-run'], function() {
+gulp.task('protractor-run', ['jshint-run'], function () {
   return gulp.src([filePaths.e2eTestJS])
     .pipe(protractor({
       'configFile': 'protractor.conf.js'
     }))
     // .on('error', function(e) { throw e });
-    .on('error', function(e) {
+    .on('error', function (e) {
       gutil.log(e.message);
     });
 
 });
 
-gulp.task('protractor-watch', function() {
+gulp.task('protractor-watch', function () {
   gulp.watch(['src/client/**/*.js',
     'src/client/**/*.html',
     'src/client/**/*.css',
@@ -60,7 +65,7 @@ gulp.task('protractor-watch', function() {
   ], ['protractor-run', 'karma-run', 'jshint-run']);
 });
 
-gulp.task('browser-sync', function() {
+gulp.task('browser-sync', function () {
   startBrowserSync();
   // browserSync.init({
   //   server:{
@@ -76,20 +81,55 @@ gulp.task('browser-sync', function() {
 //   gutil.log('Gulp is running!');
 // });
 
-
-
-
 gulp.task('default', [
-  'browser-sync',
+  // 'browser-sync',
   'jshint-run',
-  'karma-run',
-  'protractor-run',
+  //'karma-run',
+  //'protractor-run',
 
   //'jshint-watch',
   'protractor-watch'
 ]);
 
+/**
+ * Start the node server using nodemon.
+ * Optionally start the node debugging.
+ * @param  {Object} args - debugging arguments
+ * @return {Stream}
+ */
+function serve(args) {
+  var options = {
+    script: './src/server/bin/www',
+    delayTime: 1,
+    env: {
+      'NODE_ENV': args.mode,
+      'PORT': 3000
+    },
+    watch: ['./src/server/**/*.*']
+  };
 
+  var exec;
+  // if (args.debug) {
+  //     log('Running node-inspector. Browse to http://localhost:8080/debug?port=5858');
+  //     exec = require('child_process').exec;
+  //     exec('node-inspector');
+  //     options.nodeArgs = [args.debug + '=5858'];
+  // }
+
+  return nodemon(options)
+    .on('start', function () {
+      startBrowserSync();
+    })
+    //.on('change', tasks)
+    .on('restart', function () {
+      log('restarted!');
+      setTimeout(function () {
+        browserSync.reload({
+          stream: false
+        });
+      }, 1000);
+    });
+}
 
 function startBrowserSync() {
   // if(!env.browserSync || browserSync.active) {

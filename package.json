@@ -23,7 +23,8 @@
     "moment": "^2.10.2",
     "mongoose": "^4.0.1",
     "morgan": "~1.5.1",
-    "serve-favicon": "~2.2.0"
+    "serve-favicon": "~2.2.0",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "browser-sync": "^2.7.1",
