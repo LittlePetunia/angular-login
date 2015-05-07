@@ -114,7 +114,7 @@ module.exports = (function () {
 
       error = new Error();
       error.message = 'update operation requires user object to have _id';
-      error.statusCode = 400; // bad request
+      error.statusCode = 422; //422 Unprocessable Entity
       promise.reject(error);
       return promise;
     }

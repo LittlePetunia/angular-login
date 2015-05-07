@@ -196,14 +196,14 @@ describe('User DAL', function () {
       }, done);
   });
 
-  it('should return 400 error if no _id set updating', function (done) {
+  it('should return 422 error if no _id set updating', function (done) {
     user._id = null;
     userDAL.update(user)
       .then(function (data) {
         expect('this should not be called').to.equal('');
       }, function (err) {
         expect(err.message).to.be.equal('update operation requires user object to have _id');
-        expect(err.statusCode).to.be.equal(400); // not found
+        expect(err.statusCode).to.be.equal(422); // not found
       })
       .then(function () {
         done();
