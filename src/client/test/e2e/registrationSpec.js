@@ -1,14 +1,15 @@
 'use strict';
 
 /* global protractor */
+/* global $$ */
 var path = require('path');
 var Q = require('q');
 // var moment = require('moment');
 var RegistrationPage = require('./registration.page.js');
 var request = require('superagent');
-
 var usersRootUri = 'localhost:3000/api/users';
 
+// console.log(JSON.stringify(protractor));
 var fakeUserId = '5536a74e354d000000000000';
 
 var urlHelper = {
@@ -29,11 +30,11 @@ var urlHelper = {
   }
 };
 
-function hasClass(element, cls) {
-  return element.getAttribute('class').then(function (classes) {
-    return classes.split(' ').indexOf(cls) !== -1;
-  });
-}
+// function hasClass(element, cls) {
+//   return element.getAttribute('class').then(function (classes) {
+//     return classes.split(' ').indexOf(cls) !== -1;
+//   });
+// }
 
 function getUsers(userId) {
   var deferred = Q.defer();
@@ -91,6 +92,7 @@ describe('Registration form', function () {
   });
 
   var page;
+  var ptor;
   beforeEach(function () {
     page = new RegistrationPage();
   });
@@ -116,7 +118,8 @@ describe('Registration form', function () {
     page.firstName = 'test';
     page.lastName = 'user';
 
-    expect(element.all(by.css('#userForm.ng-invalid')).count()).toEqual(1);
+    expect($$('#userForm.ng-invalid').count()).toEqual(1);
+
   });
 
   it('should have validation errors if password field is too short', function () {
@@ -128,7 +131,8 @@ describe('Registration form', function () {
     page.firstName = 'test';
     page.lastName = 'user';
 
-    expect(element.all(by.css('#userForm.ng-invalid')).count()).toEqual(1);
+    expect($$('#userForm.ng-invalid').count()).toEqual(1);
+
   });
 
   it('should have validation errors if email field is invalid', function () {
@@ -140,13 +144,14 @@ describe('Registration form', function () {
     page.lastName = 'user';
 
     page.email = 'testuser11mail.com';
-    expect(element.all(by.css('#userForm.ng-invalid')).count()).toEqual(1);
+    expect($$('#userForm.ng-invalid').count()).toEqual(1);
 
     page.email = 'testuser11@mailcom.';
-    expect(element.all(by.css('#userForm.ng-invalid')).count()).toEqual(1);
+    expect($$('#userForm.ng-invalid').count()).toEqual(1);
 
     page.email = '@testuser11mail.com';
-    expect(element.all(by.css('#userForm.ng-invalid')).count()).toEqual(1);
+    expect($$('#userForm.ng-invalid').count()).toEqual(1);
+
   });
 
   it('should have validation errors if firstName field is empty', function () {
@@ -158,7 +163,8 @@ describe('Registration form', function () {
     // page.firstName = 'test';
     page.lastName = 'user';
 
-    expect(element.all(by.css('#userForm.ng-invalid')).count()).toEqual(1);
+    expect($$('#userForm.ng-invalid').count()).toEqual(1);
+
   });
 
   it('should have validation errors if lastName field is empty', function () {
@@ -170,10 +176,10 @@ describe('Registration form', function () {
     page.firstName = 'test';
     // page.lastName = 'user';
 
-    expect(element.all(by.css('#userForm.ng-invalid')).count()).toEqual(1);
+    expect($$('#userForm.ng-invalid').count()).toEqual(1);
   });
 
-  it('should show success popup if user created', function (done) {
+  it('should show success popup when user is successfully submitted', function (done) {
 
     expect(page.userMessageDiv.isDisplayed()).toEqual(false);
 
@@ -184,13 +190,13 @@ describe('Registration form', function () {
     page.firstName = 'test';
     page.lastName = 'user';
 
-    element.all(by.css('#userForm.ng-invalid'))
+    $$('#userForm.ng-valid')
       .count()
       .then(function (val) {
-        expect(val).toEqual(0);
+        expect(val).toEqual(1);
         if (val === 0) {
           page.btnSubmit.click();
-          expect(page.userMessageDiv.isDisplayed()).toEqual(true);
+          expect($$('#userMessage.alert-success').first().isDisplayed()).toEqual(true);
           done();
         } else {
           done();
@@ -198,20 +204,58 @@ describe('Registration form', function () {
       });
   });
 
-  xit('should not create a new user when form cancel button clicked', function () {
-    expect(true).toEqual(true);
+  it('should show error popup when user submission fails because of duplicate username', function () {
+
+    page.formClear();
+    page.userName = 'testUser22';
+    page.password = 'password11';
+    page.email = 'testuser11@mail.com';
+    page.firstName = 'test';
+    page.lastName = 'user';
+
+    page.btnSubmit.click();
+    // expect($$('#userMessage.alert-success').first().isDisplayed()).toEqual(true);
+
+    browser.wait(function () {
+        return browser.getCurrentUrl().then(function (url) {
+          //console.log(url);
+          // return url.indexOf('/login') > -1;
+          return /\/login$/.test(url);
+        });
+      }, 2000)
+      .then(function () {
+        page = new RegistrationPage(); // this will redirect us back to the registration page
+        page.formClear();
+        page.userName = 'testUser22';
+        page.password = 'password11';
+        page.email = 'testuser11@mail.com';
+        page.firstName = 'test';
+        page.lastName = 'user';
+
+        page.btnSubmit.click();
+        expect($$('#userMessage.alert-danger').first().isDisplayed()).toEqual(true);
+      });
   });
 
-  xit('should show validation message if username length is less than 8 characters', function () {
-    expect(true).toEqual(true);
-  });
+  it('should redirect to login screen after successful user creation', function () {
+    page.formClear();
+    page.userName = 'testUser22';
+    page.password = 'password11';
+    page.email = 'testuser11@mail.com';
+    page.firstName = 'test';
+    page.lastName = 'user';
 
-  xit('should show validation message if password is less than 8 characters', function () {
-    expect(true).toEqual(true);
-  });
+    page.btnSubmit.click();
 
-  xit('should redirect to welcome screen after successful form submission', function () {
-    expect(true).toEqual(true);
+    browser.wait(function () {
+        return browser.getCurrentUrl().then(function (url) {
+          //console.log(url);
+          return /\/login$/.test(url);
+        });
+      }, 2000)
+      .then(function () {
+        expect(true).toEqual(true);
+      });
   });
 
 });

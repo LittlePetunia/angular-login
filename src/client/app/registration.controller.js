@@ -4,9 +4,9 @@
   angular.module('app')
     .controller('RegistrationCtrl', RegistrationCtrl);
 
-  RegistrationCtrl.$inject = ['$rootScope', 'UserSvc'];
+  RegistrationCtrl.$inject = ['$rootScope', '$state', '$timeout', 'UserSvc'];
 
-  function RegistrationCtrl($rootScope, UserSvc) {
+  function RegistrationCtrl($rootScope, $state, $timeout, UserSvc) {
 
     $rootScope.title = 'Register';
     var vm = this;
@@ -20,13 +20,14 @@
       message: null,
       type: null,
       show: false
-    }
+    };
 
     // functions
     vm.submitUser = submitUser;
     vm.clearUserMessage = clearUserMessage;
 
     var test = true;
+    // test = false;
     if (test) {
       // vm.user.userName = 'testUser';
       // vm.user.password = 'testPassword';
@@ -47,6 +48,13 @@
       UserSvc.create(user)
         .success(function (data, status, headers, config) {
           setUserMessage('success', 'User Created! Id: ' + data._id);
+          // $state.go('login');
+          $timeout(function () {
+            setUserMessage('success', 'Redirecting to login page....');
+            $timeout(function () {
+              $state.go('login');
+            }, 1000);
+          }, 1000);
         })
         .error(function (data, status, headers, config) {
           var msg = 'Error creating user: ' + (data ? data.message : '');

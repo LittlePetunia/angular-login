@@ -25,14 +25,13 @@ RegistrationPage.prototype = Object.create({}, {
 
 });
 
-RegistrationPage.prototype.formClear = function(){
+RegistrationPage.prototype.formClear = function () {
   this.userName.clear();
   this.password.clear();
   this.email.clear();
   this.firstName.clear();
   this.lastName.clear();
 }
-
 
 function getSetById(id) {
   return {
