@@ -45,7 +45,7 @@ gulp.task('karma-run', ['jshint-run'], function (done) {
   }, done);
 });
 
-gulp.task('protractor-run', ['jshint-run'], function () {
+gulp.task('protractor-run', function () {
   return gulp.src([filePaths.e2eTestJS])
     .pipe(protractor({
       'configFile': 'protractor.conf.js'

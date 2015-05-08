@@ -9,6 +9,9 @@ function RegistrationPage() {
 
 RegistrationPage.prototype = Object.create({}, {
 
+  divMainContent: getByCss('div[ui-view="main-content"]'),
+  form: getById('userForm'),
+
   userName: getSetById('userName'),
   password: getSetById('password'),
   email: getSetById('email'),
@@ -17,12 +20,19 @@ RegistrationPage.prototype = Object.create({}, {
 
   btnSubmit: getById('btnSubmit'),
 
-  successMessageDiv: getById('successMessage'),
-  successMessageCloseButton: getById('btnSuccessMessageClose'),
-  errorMessage: getById('errorMessage'),
-  errorMessageCloseButton: getById('btnErrorMessageClose')
+  userMessageDiv: getById('userMessage'),
+  userMessageCloseButton: getById('btnUserMessageClose')
 
 });
+
+RegistrationPage.prototype.formClear = function(){
+  this.userName.clear();
+  this.password.clear();
+  this.email.clear();
+  this.firstName.clear();
+  this.lastName.clear();
+}
+
 
 function getSetById(id) {
   return {
