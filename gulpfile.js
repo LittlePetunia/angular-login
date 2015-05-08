@@ -62,8 +62,16 @@ gulp.task('protractor-watch', function () {
     'src/client/**/*.html',
     'src/client/**/*.css',
     './protractor.conf.js'
-  ], ['protractor-run', 'karma-run', 'jshint-run']);
+  ], ['protractor-run']);
 });
+
+// gulp.task('protractor-watch', function () {
+//   gulp.watch(['src/client/**/*.js',
+//     'src/client/**/*.html',
+//     'src/client/**/*.css',
+//     './protractor.conf.js'
+//   ], ['protractor-run', 'karma-run', 'jshint-run']);
+// });
 
 gulp.task('browser-sync', function () {
   startBrowserSync();

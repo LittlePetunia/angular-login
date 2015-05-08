@@ -38,13 +38,13 @@ module.exports = (function () {
       },
       firstName: {
         type: String,
-        require: true,
+        required: '{PATH} is required',
         minlength: 1,
         maxlength: 100
       },
       lastName: {
         type: String,
-        require: true,
+        required: '{PATH} is required',
         minlength: 1,
         maxlength: 100
       },

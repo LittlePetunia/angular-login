@@ -1,10 +1,9 @@
-(function(angular) {
+(function (angular) {
   'use strict';
 
   angular
     .module('app')
     .config(routeConfig);
-
 
   routeConfig.$inject = ['$stateProvider', '$urlRouterProvider'];
 
@@ -46,8 +45,8 @@
             templateUrl: 'app/layout/top-nav.html'
           },
           'main-content': {
-            templateUrl: 'app/register.html',
-            controller: 'RegisterCtrl',
+            templateUrl: 'app/registration.html',
+            controller: 'RegistrationCtrl',
             controllerAs: 'vm'
           }
         }
