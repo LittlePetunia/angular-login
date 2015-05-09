@@ -205,7 +205,7 @@ describe('User route', function () {
     it('should return error if user property is invalid', function (done) {
 
       var newUser = {
-        userName: '1234567',
+        userName: '1234567', // only 7 chars
         password: 'hellokitty2',
         email: 'testuser2@mail.com',
         firstName: 'test2',
@@ -223,7 +223,8 @@ describe('User route', function () {
           expect(res.body).to.have.all.keys('name', 'message', 'errors');
           expect(res.body.name).to.equal('ValidationError');
           expect(res.body.message).to.equal('User validation failed');
-          expect(res.body.errors).to.have.string(errorMsg);
+          expect(res.body.errors.length).to.equal(1);
+          expect(res.body.errors[0]).to.have.string(errorMsg);
           done();
         });
     });

@@ -79,9 +79,9 @@ function onError(code, res) {
     var name = err.name || 'Unspecified Error';
     var msg = err.message || err;
     // var errors = JSON.stringify(err.errors || []);
-    console.log('route error object: ' + JSON.stringify(err || ''));
+    // console.log('route error object: ' + JSON.stringify(err || ''));
 
-    console.log('route errors: ' + JSON.stringify(err.errors || []));
+    // console.log('route errors: ' + JSON.stringify(err.errors || []));
 
     // TODO: move error message normalization to the DAL.
     // decode ValidationError and MongoError errors.
