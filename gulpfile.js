@@ -130,7 +130,7 @@ function serve(args) {
     })
     //.on('change', tasks)
     .on('restart', function () {
-      log('restarted!');
+      // log('restarted!');
       setTimeout(function () {
         browserSync.reload({
           stream: false
@@ -158,6 +158,6 @@ function startBrowserSync() {
     //logLevel: 'debug',
     logPrefix: 'gulp-patterns',
     notify: true,
-    reloadDelay: 0000
+    reloadDelay: 0 //ms
   });
 }

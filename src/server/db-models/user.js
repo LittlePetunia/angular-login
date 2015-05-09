@@ -2,6 +2,8 @@ module.exports = (function () {
   'use strict';
 
   var mongoose = require('mongoose');
+  var uniqueValidator = require('mongoose-unique-validator');
+
   var mongooseUtils = require('../common/mongooseUtils.js');
   var _ = require('underscore');
   // var Promise = require('mpromise');
@@ -16,7 +18,7 @@ module.exports = (function () {
   } else {
 
     // console.log('Creating new todo model');
-    var UserSchema = new mongoose.Schema({
+    var userSchema = new mongoose.Schema({
       userName: {
         type: String,
         unique: true,
@@ -55,7 +57,11 @@ module.exports = (function () {
       }
     });
 
-    UserModel = mongoose.model('User', UserSchema);
+    userSchema.plugin(uniqueValidator, {
+      message: 'Error, {PATH} {VALUE} must be unique.'
+    });
+
+    UserModel = mongoose.model('User', userSchema);
 
   }
 
