@@ -4,6 +4,7 @@ module.exports = (function () {
 
   var mongoose = require('mongoose');
   // var uniqueValidator = require('mongoose-unique-validator');
+  var idvalidator = require('mongoose-id-validator');
 
   var ObjectId = mongoose.Schema.Types.ObjectId;
 
@@ -54,6 +55,11 @@ module.exports = (function () {
     //   message: 'Error, {PATH} {VALUE} must be unique.'
     // });
 
+    // valdidate that user with specified id really exists
+    sessionSchema.plugin(idvalidator, {
+      message: 'Error, Invalid {PATH} {VALUE}.'
+    });
+
     SessionModel = mongoose.model('Session', sessionSchema);
   }
 
@@ -67,6 +73,7 @@ module.exports = (function () {
   }
 
   function update(session) {
+    // console.log('update() session._id ' + session._id);
     if (!session._id) {
       var promise = new mongoose.Promise();
       var error = new Error();

@@ -13,6 +13,9 @@ var utils = require('../../common/utils.js');
 var testUtils = require('../../common/testUtils.js');
 var dbUri = 'mongodb://localhost/login_test';
 
+var fakeSessionId = '554e60ecce221029d0cb0000';
+var fakeUserId = '000000ecce221029d0cb0000';
+
 describe.only('Session DAL', function () {
 
   var session;
@@ -81,6 +84,33 @@ describe.only('Session DAL', function () {
       }, done);
   });
 
+  it('should return error if invalid userId specified', function (done) {
+
+    var newSession = {
+      userId: fakeUserId,
+      expireDateTime: utils.addMinutes(Date.now(), 30)
+    };
+
+    sessionDAL.create(newSession)
+      .then(function (data) {
+        return sessionDAL.get(data._id);
+      })
+      .then(function (data) {
+        console.log('updated session: ' + data);
+      })
+      .then(function (data) {
+        expect(false).to.be.true;
+      }, function (err) {
+        console.log('err: ' + JSON.stringify(err));
+
+        expect(err.message).to.equal('Session validation failed');
+        expect(err.errors.userId.message).to.equal('Error, Invalid userId ' + newSession.userId + '.');
+      })
+      .then(function () {
+        done();
+      }, done);
+  });
+
   describe('Existing session', function () {
     // create session
     var newSession;
@@ -128,6 +158,36 @@ describe.only('Session DAL', function () {
             expect(data).to.not.be.null;
             expect(data._id.equals(newSession._id)).to.be.true;
             expect(data.expireDateTime.getTime() === newExpireDateTime.getTime()).to.be.true;
+          })
+          .then(function () {
+            done();
+          }, done);
+      });
+
+      it('should return error if session has no _id', function (done) {
+
+        newSession._id = undefined;
+
+        sessionDAL.update(newSession)
+          .then(function (data) {
+            expect(false).to.be.true;
+          }, function (err) {
+            expect(err.message).to.equal('update operation requires session object to have _id value');
+          })
+          .then(function () {
+            done();
+          }, done);
+      });
+
+      it('should return error if no session found with specified _id', function (done) {
+
+        newSession._id = fakeSessionId;
+
+        sessionDAL.update(newSession)
+          .then(function (data) {
+            expect(false).to.be.true;
+          }, function (err) {
+            expect(err.message).to.equal('Session not found with id ' + newSession._id);
           })
           .then(function () {
             done();
