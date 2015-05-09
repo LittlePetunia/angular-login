@@ -47,6 +47,7 @@ module.exports = (function () {
         type: Date,
         required: '{PATH} is required'
       }
+
     });
 
     // sessionSchema.plugin(uniqueValidator, {
@@ -66,7 +67,7 @@ module.exports = (function () {
   }
 
   function update(session) {
-    if (session._id) {
+    if (!session._id) {
       var promise = new mongoose.Promise();
       var error = new Error();
       error.message = 'update operation requires session object to have _id value';
@@ -85,15 +86,15 @@ module.exports = (function () {
         } else {
           data.createdDateTime = session.createdDateTime;
           data.expireDateTime = session.expireDateTime;
-          return data.save().exec();
+          return data.save();
         }
       });
   }
 
-  function deleteOld(minDateTime) {
+  function deleteOld(olderThanThisDateTime) {
     return SessionModel.find({
         'expireDateTime': {
-          $lt: minDateTime
+          $lt: olderThanThisDateTime
         }
       })
       .remove().exec();

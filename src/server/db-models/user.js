@@ -91,7 +91,7 @@ module.exports = (function () {
     var copy = _.clone(user);
     delete copy._id;
 
-    var newUser = new UserModel(user);
+    var newUser = new UserModel(copy);
     return newUser.save();
   }
 

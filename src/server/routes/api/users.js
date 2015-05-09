@@ -98,7 +98,7 @@ function onError(code, res) {
 
           for (var k in e) {
             if (e.hasOwnProperty(k) && e[k].message) {
-              console.log('errors adding message: ' + e[k].message);
+              // console.log('errors adding message: ' + e[k].message);
 
               errors.push(e[k].message);
             }

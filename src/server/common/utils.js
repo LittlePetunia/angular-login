@@ -7,6 +7,7 @@ module.exports = {
   addDays: addDays,
   addHours: addHours,
   addMinutes: addMinutes,
+  addMilliseconds: addMilliseconds
 };
 
 function cloneDeep(obj) {
@@ -31,5 +32,12 @@ function addMinutes(date, minutes) {
 
   var newDate = new Date(date);
   newDate.setMinutes(newDate.getMinutes() + minutes);
+  return newDate;
+}
+
+function addMilliseconds(date, ms) {
+
+  var newDate = new Date(date);
+  newDate.setMilliseconds(newDate.getMilliseconds() + ms);
   return newDate;
 }
