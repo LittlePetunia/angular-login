@@ -16,7 +16,8 @@ function onSuccess(code, res) {
 function onError(code, res) {
   return function (err) {
 
-    //console.log('having an error: ' + JSON.stringify(err));
+    console.log('having an error: ' + JSON.stringify(err));
+    console.log('having an error: ' + err);
 
     code = err.statusCode || code || 500;
     var name = err.name || 'Unspecified Error';
