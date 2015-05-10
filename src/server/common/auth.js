@@ -32,7 +32,7 @@ function authenticate(userName, password) {
           expireDateTime: expireDateTime
         })
         .then(function (data) {
-            log.info('update', 'success', data);
+            log.success('update', 'success', data);
             return data;
           },
           function (err) {

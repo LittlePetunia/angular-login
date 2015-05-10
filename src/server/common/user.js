@@ -6,6 +6,8 @@ var _ = require('underscore');
 
 var mongooseUtils = require('../common/mongooseUtils.js');
 var UserModel = require('../db-models/user.js');
+var log = require('./myLog.js').create('/server/common/user');
+
 
 function get(condition) {
   return UserModel.find(condition).exec();
@@ -24,7 +26,15 @@ function getById(userId) {
         throw error;
       }
       return dbUser;
-    });
+    })
+    .then(function (data) {
+        log.success('create', 'success', data);
+        return data;
+      },
+      function (err) {
+        log.error('create', 'error', err);
+        throw err;
+      });;
 }
 
 function getByUserNamePassword(userName, password) {

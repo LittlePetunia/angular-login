@@ -23,7 +23,7 @@ function create(session) {
 
   return s.save()
     .then(function (data) {
-        log.info('create', 'success', data);
+        log.success('create', 'success', data);
         return data;
       },
       function (err) {
@@ -57,7 +57,7 @@ function update(session) {
       }
     })
     .then(function (data) {
-        log.info('update', 'success', data);
+        log.success('update', 'success', data);
         return data;
       },
       function (err) {

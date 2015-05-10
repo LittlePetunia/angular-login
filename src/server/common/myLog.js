@@ -12,40 +12,35 @@ function Logger(fileName) {
   this.fileName = fileName;
 }
 
+Logger.prototype.success = function (functionName, msg, data) {
+  this.log('Success', this.fileName, functionName, msg, data);
+};
+
 Logger.prototype.info = function (functionName, msg, data) {
-  // console.log('Logger.logFlag: ' + Logger.logFlag);
-  // console.log('this.logFlag: ' + this.logFlag);
-  if (Logger.logFlag) {
-    console.log();
-    console.log('Info' + ': ' + this.fileName + ': ' + functionName);
-    console.log(this.format('Info', this.fileName, functionName, msg, data));
-  }
+  this.log('Info', this.fileName, functionName, msg, data);
 };
 
 Logger.prototype.error = function (functionName, msg, data) {
-  if (Logger.logFlag) {
-    console.log();
-    console.log('Error' + ': ' + this.fileName + ': ' + functionName);
-    console.log(this.format('Error', this.fileName, functionName, msg, data));
-  }
+  this.log('Error', this.fileName, functionName, msg, data);
 };
 
-Logger.prototype.format = function (type, fileName, functionName, msg, data) {
-  var arr = [];
-  if (msg != null) {
-    // msg = ': ' + msg;
-    msg = msg;
-  } else {
+Logger.prototype.log = function (type, fileName, functionName, msg, data) {
+
+  if (msg == null) {
     msg = '';
   }
+
   if (data != null) {
     data = ': ' + JSON.stringify(data);
   } else {
     data = '';
   }
 
-  //return type + ': ' + fileName + ': ' + functionName + msg + data;
-  return msg + data;
+  if (Logger.logFlag) {
+    console.log();
+    console.log(type + ': ' + this.fileName + ': ' + functionName);
+    console.log(msg, data);
+  }
 };
 
 Logger.logFlag = false;
