@@ -13,7 +13,7 @@ var expect = require('chai').expect;
 var path = require('path');
 
 var testUtils = require('../../common/testUtils.js');
-var userDAL = require('../../db-models/user.js');
+var userDAL = require('../../common/user.js');
 var app = require('../../app.js');
 
 var dbUri = 'mongodb://localhost/login_test';

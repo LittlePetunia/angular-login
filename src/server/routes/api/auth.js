@@ -4,15 +4,25 @@
 
 var express = require('express');
 var router = express.Router();
-var mongoose = require('mongoose');
-var User = require('./../../db-models/user.js');
-var path = require('path');
+var authDAL = require('../../common/auth.js');
+var routeUtils = require('../routeUtils.js');
 
-router.post('/login', function(req, res, next){
+router.post('/login', function (req, res, next) {
+
+  console.log('ready to login');
   var userInfo = req.body;
 
-  // check username/pass against user info in db
-  // if valid then create a session for the user?
+  authDAL.authenticate(userInfo.userName, userInfo.password)
+    .then(routeUtils.onSuccess(200, res),
+      routeUtils.onError(500, res));
+  // .then(function (data) {
+  //   console.log('authenticate success: ' + JSON.stringify(data));
+  //   res.status(200).json(data);
+  //
+  // }, function (err) {
+  //   console.log('authenticate error: ' + JSON.stringify(err));
+  //   res.status(500).json(err);
+  // });
 });
 //
 // // GET All

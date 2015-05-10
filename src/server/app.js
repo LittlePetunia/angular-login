@@ -8,6 +8,11 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
+// configure dev logger
+require('./common/myLog.js').config({
+  logFlag: true
+});
+
 var port = process.env.PORT || 3000;
 var env = process.env.NODE_ENV || 'dev';
 

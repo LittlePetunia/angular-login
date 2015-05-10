@@ -5,10 +5,8 @@
 /* global after */
 /*jshint -W079 */
 var expect = require('chai').expect;
-
 var mongoose = require('mongoose');
-var userDAL = require('../../db-models/user.js');
-// var dateUtils = require('../../common/dateUtils.js');
+var userDAL = require('../../common/user.js');
 var testUtils = require('../../common/testUtils.js');
 var dbUri = 'mongodb://localhost/login_test';
 

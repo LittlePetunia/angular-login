@@ -3,7 +3,6 @@
 var mongoose = require('mongoose');
 // var uniqueValidator = require('mongoose-unique-validator');
 var idvalidator = require('mongoose-id-validator');
-var _ = require('underscore');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
@@ -26,11 +25,8 @@ var ObjectId = mongoose.Schema.Types.ObjectId;
 //     });
 // });
 
-var SessionModel;
+if (!mongoose.models.Session) {
 
-if (mongoose.models.Session) {
-  SessionModel = mongoose.model('Session');
-} else {
   var sessionSchema = new mongoose.Schema({
 
     userId: {
@@ -59,61 +55,7 @@ if (mongoose.models.Session) {
     message: 'Error, Invalid {PATH} {VALUE}.'
   });
 
-  SessionModel = mongoose.model('Session', sessionSchema);
+  mongoose.model('Session', sessionSchema);
 }
 
-function get(id) {
-  return SessionModel.findById(id).exec();
-}
-
-function create(session) {
-
-  var copy = _.clone(session);
-  delete copy._id;
-
-  var s = new SessionModel(copy);
-  return s.save();
-}
-
-function update(session) {
-  // console.log('update() session._id ' + session._id);
-  if (!session._id) {
-    var promise = new mongoose.Promise();
-    var error = new Error();
-    error.message = 'update operation requires session object to have _id value';
-    error.statusCode = 422; //422 Unprocessable Entity
-    promise.reject(error);
-    return promise;
-  }
-
-  return get(session._id)
-    .then(function (data) {
-      if (!data) {
-        var error = new Error();
-        error.message = 'Session not found with id ' + session._id;
-        error.statusCode = 404; // not found
-        throw error;
-      } else {
-        data.createdDateTime = session.createdDateTime;
-        data.expireDateTime = session.expireDateTime;
-        return data.save();
-      }
-    });
-}
-
-function deleteOld(olderThanThisDateTime) {
-  return SessionModel.find({
-      'expireDateTime': {
-        $lt: olderThanThisDateTime
-      }
-    })
-    .remove().exec();
-}
-
-module.exports = {
-  Model: SessionModel,
-  get: get,
-  create: create,
-  update: update,
-  deleteOld: deleteOld
-};
+module.exports = mongoose.model('Session');

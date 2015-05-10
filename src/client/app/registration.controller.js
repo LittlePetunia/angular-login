@@ -35,9 +35,9 @@
       // vm.user.firstName = 'test';
       // vm.user.lastName = 'user';
       vm.form = {};
-      vm.form.userName = 'testUser';
-      vm.form.password = 'testPassword';
-      vm.form.email = 'test@mail.com';
+      vm.form.userName = 'testUser1234';
+      vm.form.password = 'testUser1234';
+      vm.form.email = 'testUser1234@mail.com';
       vm.form.firstName = 'test';
       vm.form.lastName = 'form';
     }

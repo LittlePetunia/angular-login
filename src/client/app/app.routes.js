@@ -32,9 +32,9 @@
             templateUrl: 'app/layout/top-nav.html'
           },
           'main-content': {
-            templateUrl: 'app/login.html'
-              // controller: 'TodoCtrl',
-              // controllerAs: 'vm'
+            templateUrl: 'app/login.html',
+            controller: 'LoginCtrl',
+            controllerAs: 'vm'
           }
         }
       })

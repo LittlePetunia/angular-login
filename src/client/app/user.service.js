@@ -23,12 +23,13 @@
       return $http.post(userUrl, user);
     }
 
-    function login(userInfo){
+    function login(userInfo) {
       return $http.post(loginUrl, userInfo);
     }
 
     return {
-      create: create
+      create: create,
+      login: login
     }
   }
 })(this.angular);

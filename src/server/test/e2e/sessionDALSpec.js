@@ -7,8 +7,8 @@
 var expect = require('chai').expect;
 
 var mongoose = require('mongoose');
-var sessionDAL = require('../../db-models/session.js');
-var userDAL = require('../../db-models/user.js');
+var sessionDAL = require('../../common/session.js');
+var userDAL = require('../../common/user.js');
 var utils = require('../../common/utils.js');
 var testUtils = require('../../common/testUtils.js');
 var dbUri = 'mongodb://localhost/login_test';
