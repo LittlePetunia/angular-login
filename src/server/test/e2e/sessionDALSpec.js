@@ -65,53 +65,79 @@ describe('Session DAL', function () {
     testUtils.closeConnection(mongoose, done);
   });
 
-  it('should create a new session', function (done) {
-    var newSession = {
-      userId: user._id,
-      expireDateTime: utils.addMinutes(Date.now(), 30)
-    };
+  describe('create', function () {
+    it('should create a new session', function (done) {
+      var newSession = {
+        // _id: fakeSessionId,
+        userId: user._id,
+        expireDateTime: utils.addMinutes(Date.now(), 30)
+      };
 
-    sessionDAL.create(newSession)
-      .then(function (data) {
-        return sessionDAL.Model.find().exec();
-      })
-      .then(function (data) {
-        expect(data).to.not.be.null;
-        expect(data).to.have.length(1);
-      })
-      .then(function () {
-        done();
-      }, done);
+      sessionDAL.create(newSession)
+        .then(function (data) {
+          return sessionDAL.Model.find().exec();
+        })
+        .then(function (data) {
+          // console.log(data);
+          expect(data).to.not.be.null;
+          expect(data).to.have.length(1);
+        })
+        .then(function () {
+          done();
+        }, done);
+    });
+
+    it('should create a new session with new _id even if one is passed in', function (done) {
+      var newSession = {
+        _id: fakeSessionId,
+        userId: user._id,
+        expireDateTime: utils.addMinutes(Date.now(), 30)
+      };
+
+      sessionDAL.create(newSession)
+        .then(function (data) {
+          return sessionDAL.Model.find().exec();
+        })
+        .then(function (data) {
+          // console.log(data);
+          expect(data).to.not.be.null;
+          expect(data).to.have.length(1);
+          expect(data[0]._id.equals(fakeSessionId)).to.be.false;
+        })
+        .then(function () {
+          done();
+        }, done);
+    });
+
+    it('should return error if invalid userId specified', function (done) {
+
+      var newSession = {
+        userId: fakeUserId,
+        expireDateTime: utils.addMinutes(Date.now(), 30)
+      };
+
+      sessionDAL.create(newSession)
+        .then(function (data) {
+          return sessionDAL.get(data._id);
+        })
+        .then(function (data) {
+          // console.log('updated session: ' + data);
+        })
+        .then(function (data) {
+          expect(false).to.be.true;
+        }, function (err) {
+          // console.log('err: ' + JSON.stringify(err));
+
+          expect(err.message).to.equal('Session validation failed');
+          expect(err.errors.userId.message).to.equal('Error, Invalid userId ' + newSession.userId + '.');
+        })
+        .then(function () {
+          done();
+        }, done);
+    });
   });
 
-  it('should return error if invalid userId specified', function (done) {
-
-    var newSession = {
-      userId: fakeUserId,
-      expireDateTime: utils.addMinutes(Date.now(), 30)
-    };
-
-    sessionDAL.create(newSession)
-      .then(function (data) {
-        return sessionDAL.get(data._id);
-      })
-      .then(function (data) {
-        console.log('updated session: ' + data);
-      })
-      .then(function (data) {
-        expect(false).to.be.true;
-      }, function (err) {
-        console.log('err: ' + JSON.stringify(err));
-
-        expect(err.message).to.equal('Session validation failed');
-        expect(err.errors.userId.message).to.equal('Error, Invalid userId ' + newSession.userId + '.');
-      })
-      .then(function () {
-        done();
-      }, done);
-  });
-
-  describe('Existing session', function () {
+  describe('existing session', function () {
     // create session
     var newSession;
     beforeEach(function (done) {
