@@ -8,7 +8,8 @@ var log = require('./myLog.js').create('/server/common/session');
 var SessionModel = require('../db-models/session.js');
 
 function get(id) {
-  return SessionModel.findById(id).exec();
+  return log.promise('get',
+    SessionModel.findById(id).exec());
 }
 
 function create(session) {
@@ -21,15 +22,8 @@ function create(session) {
   var s = new SessionModel(copy);
   log.info('create', 'saving session for: ', s);
 
-  return s.save()
-    .then(function (data) {
-        log.success('create', 'success', data);
-        return data;
-      },
-      function (err) {
-        log.error('create', 'error', err);
-        throw err;
-      });
+  return log.promise('create',
+    s.save());
 }
 
 function update(session) {
@@ -43,7 +37,8 @@ function update(session) {
     return promise;
   }
 
-  return get(session._id)
+  return log.promise('update',
+    get(session._id)
     .then(function (data) {
       if (!data) {
         var error = new Error();
@@ -55,24 +50,17 @@ function update(session) {
         data.expireDateTime = session.expireDateTime;
         return data.save();
       }
-    })
-    .then(function (data) {
-        log.success('update', 'success', data);
-        return data;
-      },
-      function (err) {
-        log.error('update', 'error', err);
-        throw err;
-      });
+    }));
 }
 
 function deleteOld(olderThanThisDateTime) {
-  return SessionModel.find({
+  return log.promise('deleteOld',
+    SessionModel.find({
       'expireDateTime': {
         $lt: olderThanThisDateTime
       }
     })
-    .remove().exec();
+    .remove().exec());
 }
 
 module.exports = {

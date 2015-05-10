@@ -27,18 +27,12 @@ function authenticate(userName, password) {
       var durationMinutes = 30;
       var expireDateTime = utils.addMinutes(Date.now(), durationMinutes);
 
-      return sessionDAL.create({
+      return log.promise('authenticate',
+        sessionDAL.create({
           userId: data._id,
           expireDateTime: expireDateTime
         })
-        .then(function (data) {
-            log.success('update', 'success', data);
-            return data;
-          },
-          function (err) {
-            log.error('update', 'error', err);
-            throw err;
-          });
+      );
     });
 }
 

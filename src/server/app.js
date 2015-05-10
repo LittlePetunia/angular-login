@@ -10,7 +10,8 @@ var mongoose = require('mongoose');
 
 // configure dev logger
 require('./common/myLog.js').config({
-  logFlag: true
+  logFlag: true,
+  logTypesAllowed: ['Success', 'Error', 'Info']
 });
 
 var port = process.env.PORT || 3000;

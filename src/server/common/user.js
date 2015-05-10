@@ -8,13 +8,13 @@ var mongooseUtils = require('../common/mongooseUtils.js');
 var UserModel = require('../db-models/user.js');
 var log = require('./myLog.js').create('/server/common/user');
 
-
 function get(condition) {
   return UserModel.find(condition).exec();
 }
 
 function getById(userId) {
-  return UserModel.findOne({
+  return log.promise('getById',
+    UserModel.findOne({
       _id: userId
     })
     .exec()
@@ -26,23 +26,16 @@ function getById(userId) {
         throw error;
       }
       return dbUser;
-    })
-    .then(function (data) {
-        log.success('create', 'success', data);
-        return data;
-      },
-      function (err) {
-        log.error('create', 'error', err);
-        throw err;
-      });;
+    }));
 }
 
 function getByUserNamePassword(userName, password) {
-  return UserModel.findOne({
+  return log.promise('getByUserNamePassword',
+    UserModel.findOne({
       userName: userName,
       password: password
     })
-    .exec();
+    .exec());
 }
 
 function create(user) {
@@ -56,7 +49,8 @@ function create(user) {
 
 function deleteById(userId) {
 
-  return UserModel.findOneAndRemove({
+  return log.promise('deleteById',
+    UserModel.findOneAndRemove({
       _id: userId
     }).exec()
     .then(function (data) {
@@ -67,7 +61,7 @@ function deleteById(userId) {
         throw error;
       }
       return data;
-    });
+    }));
 }
 
 function update(user) {
@@ -84,12 +78,14 @@ function update(user) {
     return promise;
   }
 
-  return getById(user._id)
+  return log.promise('update',
+    getById(user._id)
     .then(function (dbUser) {
       // is there a better way to copy without copying any _id and  __v property?
       mongooseUtils.copyFieldsToModel(user, dbUser);
       return dbUser.save();
-    });
+    })
+  );
 }
 
 module.exports = {
