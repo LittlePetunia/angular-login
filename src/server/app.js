@@ -8,14 +8,22 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
-// configure dev logger
-require('./common/myLog.js').config({
-  logFlag: true,
-  logTypesAllowed: ['Success', 'Error', 'Info']
-});
-
 var port = process.env.PORT || 3000;
 var env = process.env.NODE_ENV || 'dev';
+var logLevel = process.env.NODE_LOG_LEVEL;
+
+// configure dev logger
+if (logLevel === 'none') {
+  require('./common/myLog.js').config({
+    logFlag: false,
+    logTypesAllowed: []
+  });
+} else {
+  require('./common/myLog.js').config({
+    logFlag: true,
+    logTypesAllowed: ['Success', 'Error', 'Info']
+  });
+}
 
 var dbName = 'login';
 if (env === 'test') {
@@ -70,5 +78,6 @@ console.log('About to crank up node');
 console.log('PORT: ' + port);
 console.log('NODE_ENV: ' + env);
 console.log('DB: ' + dbName);
+console.log('NODE_LOG_LEVEL: ' + logLevel);
 
 module.exports = app;

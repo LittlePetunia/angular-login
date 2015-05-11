@@ -13,6 +13,7 @@ var utils = require('../../common/utils.js');
 var testUtils = require('../../common/testUtils.js');
 var dbUri = 'mongodb://localhost/login_test';
 
+
 var fakeSessionId = '554e60ecce221029d0cb0000';
 var fakeUserId = '000000ecce221029d0cb0000';
 

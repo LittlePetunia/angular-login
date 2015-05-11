@@ -28,6 +28,13 @@
     vm.login = login;
     vm.clearUserMessage = clearUserMessage;
 
+    function activate() {
+      if (SessionSvc.hasSession()) {
+        // already logged in, redirect to welcome page
+        $state.go('welcome');
+      }
+    }
+
     function login(userForm) {
       UserSvc.login(userForm)
         .then(

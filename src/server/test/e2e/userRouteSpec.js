@@ -5,6 +5,7 @@
 /* global after */
 
 process.env.NODE_ENV = 'test';
+process.env.NODE_LOG_LEVEL = 'none';
 
 var mongoose = require('mongoose');
 var request = require('supertest');
@@ -14,6 +15,7 @@ var path = require('path');
 
 var testUtils = require('../../common/testUtils.js');
 var userDAL = require('../../common/user.js');
+
 var app = require('../../app.js');
 
 var dbUri = 'mongodb://localhost/login_test';
@@ -37,39 +39,6 @@ var urlHelper = {
     return path.join(usersRootUri, userId.toString());
   }
 };
-
-// function clearUsers(done) {
-//   userDAL.Model.remove({}, function (err) {
-//     done(err);
-//   });
-// }
-
-// function createTestUser(done) {
-//   console.log('before each running');
-//   var user = {
-//     userName: 'testUser',
-//     password: 'hellokitty',
-//     email: 'testuser@mail.com',
-//     firstName: 'test',
-//     lastName: 'user'
-//   };
-//
-//   userDAL.create(user)
-//     .then(function (data) {
-//       return userDAL.get({
-//         userName: user.userName
-//       });
-//     })
-//     .then(function (data) {
-//       expect(data).to.have.length(1);
-//       user._id = data[0]._id;
-//     })
-//     .then(function () {
-//       done();
-//     }, done);
-//
-//   return user;
-// }
 
 describe('User route', function () {
 

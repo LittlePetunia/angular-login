@@ -11,19 +11,22 @@ function config(cfg) {
 
 function Logger(fileName) {
   this.fileName = fileName;
+
+  // console.log('Logger construction logFlag: ' + Logger.logFlag);
+  // console.log('Logger construction logTypesAllowed: ' + Logger.logTypesAllowed);
 }
 
 Logger.prototype.promise = function (functionName, promise) {
 
   var that = this;
   return promise.then(function (data) {
-      console.log('successfully');
+      // console.log('successfully');
 
       that.success(functionName, 'success', data);
       return data;
     },
     function (err) {
-      console.log('UN-successfully');
+      // console.log('UN-successfully');
       that.error(functionName, 'error', err);
       throw err;
     });
@@ -54,9 +57,13 @@ Logger.prototype.error = function (functionName, msg, err, data) {
 
 Logger.prototype.log = function (type, fileName, functionName, msg, data) {
 
-  if (Logger.logFlag && Logger.logTypesAllowed.indexOf(type) === -1) {
+  // console.log('starting to log');
+  if (!Logger.logFlag || Logger.logTypesAllowed.indexOf(type) === -1) {
     return;
+    // console.log('exiting to log');
+
   }
+  // console.log('continuing to log');
 
   if (msg == null) {
     msg = '';
@@ -75,7 +82,7 @@ Logger.prototype.log = function (type, fileName, functionName, msg, data) {
 };
 
 Logger.logFlag = false;
-Logger.logTypesAllowed = ['Success', 'Error', 'Info'];
+Logger.logTypesAllowed = [];
 
 module.exports = {
   create: create,

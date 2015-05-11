@@ -30,8 +30,13 @@
       return angular.copy(session);
     }
 
+    function hasSession() {
+      return session._id !== null;
+    }
+
     return {
       create: create,
+      hasSession: hasSession,
       get: get,
       clear: clear
     };
