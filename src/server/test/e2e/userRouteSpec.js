@@ -247,7 +247,7 @@ describe('User route', function () {
               expect(res.body._id.toString()).to.equal(user._id.toString());
               expect(res.body.userName).to.be.equal(updateUser.userName);
               expect(res.body.email).to.be.equal(updateUser.email);
-              expect(res.body.password).to.be.equal(updateUser.password);
+              // expect(res.body.password).to.be.equal(updateUser.password);
               expect(res.body.firstName).to.be.equal(updateUser.firstName);
               expect(res.body.lastName).to.be.equal(updateUser.lastName);
               done();

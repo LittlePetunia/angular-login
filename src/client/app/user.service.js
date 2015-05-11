@@ -27,8 +27,13 @@
       return $http.post(loginUrl, userInfo);
     }
 
+    function get(userId) {
+      return $http.get(userUrl + '/' + userId);
+    }
+
     return {
       create: create,
+      get: get,
       login: login
     }
   }

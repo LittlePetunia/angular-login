@@ -118,7 +118,9 @@ describe('User DAL', function () {
 
     userDAL.update(updateUser)
       .then(function (data) {
-        return userDAL.getById(user._id);
+        return userDAL.Model.findOne({
+          _id: user._id
+        }).exec();
       })
       .then(function (data) {
         expect(data).to.not.be.null;

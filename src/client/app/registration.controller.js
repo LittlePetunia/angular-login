@@ -1,12 +1,12 @@
-(function () {
+(function (angular) {
   'use strict';
 
   angular.module('app')
     .controller('RegistrationCtrl', RegistrationCtrl);
 
-  RegistrationCtrl.$inject = ['$rootScope', '$state', '$timeout', 'UserSvc'];
+  RegistrationCtrl.$inject = ['$rootScope', '$state', '$timeout', 'UserSvc', 'SessionSvc'];
 
-  function RegistrationCtrl($rootScope, $state, $timeout, UserSvc) {
+  function RegistrationCtrl($rootScope, $state, $timeout, UserSvc, SessionSvc) {
 
     $rootScope.title = 'Register';
     var vm = this;
@@ -29,17 +29,22 @@
     var test = true;
     // test = false;
     if (test) {
-      // vm.user.userName = 'testUser';
-      // vm.user.password = 'testPassword';
-      // vm.user.email = 'test@mail.com';
-      // vm.user.firstName = 'test';
-      // vm.user.lastName = 'user';
       vm.form = {};
       vm.form.userName = 'testUser1234';
       vm.form.password = 'testUser1234';
       vm.form.email = 'testUser1234@mail.com';
       vm.form.firstName = 'test';
-      vm.form.lastName = 'form';
+      vm.form.lastName = 'user';
+    }
+
+    // activation
+    activate();
+
+    function activate() {
+      if (SessionSvc.hasSession()) {
+        // already logged in, redirect to welcome page
+        $state.go('welcome');
+      }
     }
 
     // functions for collecting form data and submitting new user info
@@ -50,11 +55,16 @@
           setUserMessage('success', 'User Created! Id: ' + data._id);
           // $state.go('login');
           $timeout(function () {
-            setUserMessage('success', 'Redirecting to login page....');
-            $timeout(function () {
-              $state.go('login');
-            }, 1000);
+            setUserMessage('success', 'Logging you in....');
+            // $timeout(function () {
+            //   $state.go('login');
+            // }, 1000);
           }, 1000);
+
+          login({
+            userName: user.userName,
+            password: user.password
+          });
         })
         .error(function (data, status, headers, config) {
           var msg = 'Error creating user: ' + (data ? data.message : '');
@@ -63,6 +73,20 @@
           }
           setUserMessage('error', msg);
         });
+    }
+
+    function login(loginForm) {
+      UserSvc.login(loginForm)
+        .then(
+          function (resOk) {
+            // add user to root scope?
+            SessionSvc.create(resOk.data._id, resOk.data.userId);
+            // redirect to welcome page for now
+            $state.go('welcome');
+          },
+          function (resErr) {
+            setUserMessage(vm.userMessageTypes.error, resErr.data.message);
+          });
     }
 
     function setUserMessage(type, message) {

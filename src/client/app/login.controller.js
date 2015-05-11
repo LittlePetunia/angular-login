@@ -28,6 +28,8 @@
     vm.login = login;
     vm.clearUserMessage = clearUserMessage;
 
+    activate();
+
     function activate() {
       if (SessionSvc.hasSession()) {
         // already logged in, redirect to welcome page
@@ -38,14 +40,14 @@
     function login(userForm) {
       UserSvc.login(userForm)
         .then(
-          function (session) {
+          function (resOk) {
             // add user to root scope?
-            SessionSvc.create(session._id);
+            SessionSvc.create(resOk.data._id, resOk.data.userId);
             // redirect to welcome page for now
             $state.go('welcome');
           },
-          function (err) {
-            setUserMessage(vm.userMessageTypes.error, err.data.message);
+          function (resErr) {
+            setUserMessage(vm.userMessageTypes.error, resErr.data.message);
           });
     }
 

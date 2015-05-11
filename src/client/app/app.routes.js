@@ -16,12 +16,14 @@
         url: '/welcome',
         views: {
           'top-nav': {
-            templateUrl: 'app/layout/top-nav.html'
+            templateUrl: 'app/layout/top-nav.html',
+            controller: 'MenuCtrl',
+            controllerAs: 'vm'
           },
           'main-content': {
-            templateUrl: 'app/welcome.html'
-              //controller: 'HomeCtrl',
-              //controllerAs: 'vm'
+            templateUrl: 'app/welcome.html',
+            controller: 'WelcomeCtrl',
+            controllerAs: 'vm'
           }
         }
       })
@@ -29,7 +31,9 @@
         url: '/login',
         views: {
           'top-nav': {
-            templateUrl: 'app/layout/top-nav.html'
+            templateUrl: 'app/layout/top-nav.html',
+            controller: 'MenuCtrl',
+            controllerAs: 'vm'
           },
           'main-content': {
             templateUrl: 'app/login.html',
@@ -42,7 +46,9 @@
         url: '/register',
         views: {
           'top-nav': {
-            templateUrl: 'app/layout/top-nav.html'
+            templateUrl: 'app/layout/top-nav.html',
+            controller: 'MenuCtrl',
+            controllerAs: 'vm'
           },
           'main-content': {
             templateUrl: 'app/registration.html',

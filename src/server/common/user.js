@@ -8,8 +8,12 @@ var mongooseUtils = require('../common/mongooseUtils.js');
 var UserModel = require('../db-models/user.js');
 var log = require('./myLog.js').create('/server/common/user');
 
+var userFields = 'userId userName email firstName lastName';
+
 function get(condition) {
-  return UserModel.find(condition).exec();
+  return UserModel
+    .find(condition)
+    .select(userFields).exec();
 }
 
 function getById(userId) {
@@ -17,6 +21,7 @@ function getById(userId) {
     UserModel.findOne({
       _id: userId
     })
+    .select(userFields)
     .exec()
     .then(function (dbUser) {
       if (!dbUser) {
@@ -30,11 +35,13 @@ function getById(userId) {
 }
 
 function getByUserNamePassword(userName, password) {
+
   return log.promise('getByUserNamePassword',
     UserModel.findOne({
       userName: userName,
       password: password
     })
+    .select(userFields)
     .exec());
 }
 
