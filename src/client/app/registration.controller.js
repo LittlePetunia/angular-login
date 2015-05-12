@@ -4,9 +4,9 @@
   angular.module('app')
     .controller('RegistrationCtrl', RegistrationCtrl);
 
-  RegistrationCtrl.$inject = ['$rootScope', '$state', '$timeout', 'UserSvc', 'SessionSvc'];
+  RegistrationCtrl.$inject = ['$rootScope', '$state', '$timeout', '$window', 'UserSvc', 'SessionSvc'];
 
-  function RegistrationCtrl($rootScope, $state, $timeout, UserSvc, SessionSvc) {
+  function RegistrationCtrl($rootScope, $state, $timeout, $window, UserSvc, SessionSvc) {
 
     $rootScope.title = 'Register';
     var vm = this;
@@ -41,8 +41,7 @@
     activate();
 
     function activate() {
-      if (SessionSvc.hasSession()) {
-        // already logged in, redirect to welcome page
+      if ($window.sessionStorage.token) {
         $state.go('welcome');
       }
     }
@@ -75,18 +74,25 @@
         });
     }
 
-    function login(loginForm) {
-      UserSvc.login(loginForm)
-        .then(
-          function (resOk) {
-            // add user to root scope?
-            SessionSvc.create(resOk.data._id, resOk.data.userId);
-            // redirect to welcome page for now
+    function login(loginInfo) {
+      UserSvc.login(loginInfo)
+        .success(function (data, status, headers, config) {
+          
+          $window.sessionStorage.token = data.token;
+          UserSvc.getMe()
+          .then(function(data, status, headers, config){
+            $window.sessionStorage.user = data;
             $state.go('welcome');
-          },
-          function (resErr) {
-            setUserMessage(vm.userMessageTypes.error, resErr.data.message);
-          });
+          },function(err){
+            console.error(data, status, headers, config);
+            delete $window.sessionStorage.user;
+            setUserMessage(vm.userMessageTypes.error, data.message);
+          })
+        })
+        .error(function (data, status, headers, config) {
+          delete $window.sessionStorage.token;
+          setUserMessage(vm.userMessageTypes.error, data.message);
+        });
     }
 
     function setUserMessage(type, message) {

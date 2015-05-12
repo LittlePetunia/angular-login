@@ -5,7 +5,8 @@
 /* global after */
 
 process.env.NODE_ENV = 'test';
-process.env.NODE_LOG_LEVEL = 'none';
+// process.env.NODE_LOG_LEVEL = 'none';
+process.env.NODE_LOG_LEVEL = '';
 
 var mongoose = require('mongoose');
 var request = require('supertest');
@@ -15,14 +16,24 @@ var path = require('path');
 
 var testUtils = require('../../common/testUtils.js');
 var userDAL = require('../../common/user.js');
+var authDAL = require('../../common/auth.js');
 
 var app = require('../../app.js');
+
+var expressJwt = require('express-jwt');
+var jwt = require('jsonwebtoken');
 
 var dbUri = 'mongodb://localhost/login_test';
 var usersRootUri = '/api/users';
 var fakeUserId = '5536a74e354d000000000000';
 
 var urlHelper = {
+  login: function (user) {
+    return '/authencticate';
+  },
+  getMe: function () {
+    return path.join(usersRootUri, 'me');
+  },
   get: function (userId) {
     if (userId) {
       return path.join(usersRootUri, userId.toString());
@@ -40,6 +51,15 @@ var urlHelper = {
   }
 };
 
+// function tokenDecrypt(token){
+//   var req = {};
+//   req.headers = {};
+//     req.headers.authorization = 'Bearer ' + token;
+//     expressjwt({secret: app.get()})(req, res, function() {
+//       assert.equal('foo', req.user);
+//     });
+// }
+
 describe('User route', function () {
 
   // open db connection if needed (if mocha stays active between runs then connection still exists)
@@ -54,8 +74,9 @@ describe('User route', function () {
     });
   });
 
-  // insert test user
+  // insert test user and get token for him
   var user;
+  var token;
   beforeEach(function (done) {
     // console.log('before each running');
     user = {
@@ -67,6 +88,14 @@ describe('User route', function () {
     };
 
     userDAL.create(user)
+      .then(function () {
+        return authDAL.authenticate(user.userName, user.password);
+      })
+      .then(function (data) {
+        token = data;
+        // console.log('data: ' + data);
+        // console.log('token: ' + token);
+      })
       .then(function (data) {
         return userDAL.get({
           userName: user.userName
@@ -86,7 +115,7 @@ describe('User route', function () {
   });
 
   describe('GET /users', function () {
-    it('should get all users', function (done) {
+    it.only('should get all users', function (done) {
       // add 1 user then get should return 2 users
       var newUser = {
         userName: 'testUser2',
@@ -98,6 +127,8 @@ describe('User route', function () {
 
       request(app)
         .post(urlHelper.post())
+        .set('Authorization', 'Bearer ' + token)
+        //.set('Authorization', token)
         .send(newUser)
         .end(function (err, res) {
           expect(res.status).to.equal(201); //201 Created

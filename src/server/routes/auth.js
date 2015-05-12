@@ -4,25 +4,24 @@
 
 var express = require('express');
 var router = express.Router();
-var authDAL = require('../../common/auth.js');
-var routeUtils = require('../routeUtils.js');
+var authDAL = require('../common/auth.js');
+var routeUtils = require('./routeUtils.js');
 
-router.post('/login', function (req, res, next) {
+router.post('/authenticate', function (req, res, next) {
 
-  console.log('ready to login');
+  console.log('ready to authenticate');
   var userInfo = req.body;
 
   authDAL.authenticate(userInfo.userName, userInfo.password)
-    .then(routeUtils.onSuccess(200, res),
+    // .then(routeUtils.onSuccess(200, res),
+    .then(
+      function (data) {
+        res.status(200)
+          .json({
+            token: data
+          });
+      },
       routeUtils.onError(500, res));
-  // .then(function (data) {
-  //   console.log('authenticate success: ' + JSON.stringify(data));
-  //   res.status(200).json(data);
-  //
-  // }, function (err) {
-  //   console.log('authenticate error: ' + JSON.stringify(err));
-  //   res.status(500).json(err);
-  // });
 });
 //
 // // GET All

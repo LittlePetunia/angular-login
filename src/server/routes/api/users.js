@@ -17,6 +17,17 @@ router.get('/users', function (req, res, next) {
     .then(routeUtils.onSuccess(200, res),
       routeUtils.onError(500, res));
 });
+
+// GET me
+router.get('/users/me', function (req, res, next) {
+
+  // express-jwt decodes token and puts it on request.user
+  console.log('requested user from token: ' + req.user);
+  console.log(req.user);
+  User.getById(req.user._id)
+    .then(routeUtils.onSuccess(200, res),
+      routeUtils.onError(500, res));
+});
 // Get One
 router.get('/users/:userId', function (req, res, next) {
 

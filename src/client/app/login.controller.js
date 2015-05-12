@@ -4,9 +4,9 @@
   angular.module('app')
     .controller('LoginCtrl', LoginCtrl);
 
-  LoginCtrl.$inject = ['$rootScope', '$state', 'UserSvc', 'SessionSvc'];
+  LoginCtrl.$inject = ['$rootScope', '$state', '$window', 'UserSvc', 'SessionSvc'];
 
-  function LoginCtrl($rootScope, $state, UserSvc, SessionSvc) {
+  function LoginCtrl($rootScope, $state, $window, UserSvc, SessionSvc) {
 
     var vm = this;
     // properties
@@ -31,24 +31,22 @@
     activate();
 
     function activate() {
-      if (SessionSvc.hasSession()) {
-        // already logged in, redirect to welcome page
+      if ($window.sessionStorage.token) {
         $state.go('welcome');
       }
     }
 
-    function login(userForm) {
-      UserSvc.login(userForm)
-        .then(
-          function (resOk) {
-            // add user to root scope?
-            SessionSvc.create(resOk.data._id, resOk.data.userId);
-            // redirect to welcome page for now
-            $state.go('welcome');
-          },
-          function (resErr) {
-            setUserMessage(vm.userMessageTypes.error, resErr.data.message);
-          });
+    function login(loginInfo) {
+      UserSvc.login(loginInfo)
+        .success(function (data, status, headers, config) {
+          $window.sessionStorage.token = data.token;
+          $state.go('welcome');
+        })
+        .error(function (data, status, headers, config) {
+          delete $window.sessionStorage.token;
+          setUserMessage(vm.userMessageTypes.error, data.message);
+          console.log(data, status, headers, config);
+        });
     }
 
     function setUserMessage(type, message) {

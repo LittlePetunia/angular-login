@@ -4,9 +4,9 @@
   angular.module('app')
     .controller('WelcomeCtrl', WelcomeCtrl);
 
-  WelcomeCtrl.$inject = ['SessionSvc', 'UserSvc'];
+  WelcomeCtrl.$inject = ['SessionSvc', 'UserSvc', '$window'];
 
-  function WelcomeCtrl(SessionSvc, UserSvc) {
+  function WelcomeCtrl(SessionSvc, UserSvc, $window) {
 
     var vm = this;
     vm.user = null;
@@ -14,13 +14,14 @@
     activate();
 
     function activate() {
-      if (SessionSvc.hasSession()) {
-        UserSvc.get(SessionSvc.get().userId)
-          .then(function (resOk) {
-            vm.user = resOk.data;
-          }, function (resErr) {
-            console.error(resErr);
+      if ($window.sessionStorage.token) {
+        UserSvc.getMe()
+          .success(function (data, status, headers, config) {
+            vm.user = data;
           })
+          .error(function (err) {
+            console.error(err);
+          });
       }
     }
   }

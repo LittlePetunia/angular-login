@@ -17,7 +17,7 @@
   function UserSvc($http, $q) {
 
     var userUrl = '/api/users';
-    var loginUrl = '/api/login';
+    var loginUrl = '/authenticate';
 
     function create(user) {
       return $http.post(userUrl, user);
@@ -31,9 +31,14 @@
       return $http.get(userUrl + '/' + userId);
     }
 
+    function getMe() {
+      return $http.get(userUrl + '/' + 'me');
+    }
+
     return {
       create: create,
       get: get,
+      getMe: getMe,
       login: login
     }
   }

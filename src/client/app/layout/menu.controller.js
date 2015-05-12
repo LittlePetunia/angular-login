@@ -5,9 +5,9 @@
     .module('app')
     .controller('MenuCtrl', MenuCtrl);
 
-  MenuCtrl.$inject = ['SessionSvc', 'UserSvc'];
+  MenuCtrl.$inject = ['$window', 'SessionSvc', 'UserSvc'];
 
-  function MenuCtrl(SessionSvc, UserSvc) {
+  function MenuCtrl($window, SessionSvc, UserSvc) {
 
     var vm = this;
     vm.user = null;
@@ -19,15 +19,14 @@
     activate();
 
     function activate() {
-      if (SessionSvc.hasSession()) {
-        vm.isLoggedIn = true;
-        vm.user = UserSvc.get(SessionSvc.get().userId)
-          .then(function (resOk) {
-              vm.user = resOk.data;
-            },
-            function (resErr) {
-              console.error(resErr);
-            });
+      if ($window.sessionStorage.token) {
+        UserSvc.getMe()
+          .success(function (data, status, headers, config) {
+            vm.user = data;
+          })
+          .error(function (err) {
+            console.error(err);
+          });
       }
     }
 
@@ -42,7 +41,7 @@
     // }
 
     function logOut() {
-      SessionSvc.clear();
+      delete $window.sessionStorage.token;
       vm.user = null;
       // vm.isLoggedIn = false;
     }
