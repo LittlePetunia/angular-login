@@ -77,17 +77,17 @@
     function login(loginInfo) {
       UserSvc.login(loginInfo)
         .success(function (data, status, headers, config) {
-          
+
           $window.sessionStorage.token = data.token;
           UserSvc.getMe()
-          .then(function(data, status, headers, config){
-            $window.sessionStorage.user = data;
-            $state.go('welcome');
-          },function(err){
-            console.error(data, status, headers, config);
-            delete $window.sessionStorage.user;
-            setUserMessage(vm.userMessageTypes.error, data.message);
-          })
+            .then(function (data, status, headers, config) {
+              $window.sessionStorage.user = data;
+              $state.go('welcome');
+            }, function (err) {
+              console.error(data, status, headers, config);
+              delete $window.sessionStorage.user;
+              setUserMessage(vm.userMessageTypes.error, data.message);
+            });
         })
         .error(function (data, status, headers, config) {
           delete $window.sessionStorage.token;

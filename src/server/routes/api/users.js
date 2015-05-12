@@ -21,9 +21,7 @@ router.get('/users', function (req, res, next) {
 // GET me
 router.get('/users/me', function (req, res, next) {
 
-  // express-jwt decodes token and puts it on request.user
-  console.log('requested user from token: ' + req.user);
-  console.log(req.user);
+  // express-jwt decodes token and sets it to request.user
   User.getById(req.user._id)
     .then(routeUtils.onSuccess(200, res),
       routeUtils.onError(500, res));
@@ -31,7 +29,6 @@ router.get('/users/me', function (req, res, next) {
 // Get One
 router.get('/users/:userId', function (req, res, next) {
 
-  // console.log('getting a user: ' + req.params.userId);
   var userId = req.params.userId;
 
   User.getById(userId)
@@ -42,7 +39,6 @@ router.get('/users/:userId', function (req, res, next) {
 // POST
 router.post('/users', function (req, res, next) {
 
-  // console.log('req.baseUrl: ' + req.baseUrl);
   User.create(req.body) // 201: created
     .then(function (data) {
         res
@@ -82,67 +78,5 @@ router.put('/users/:userId', function (req, res, next) {
     .then(routeUtils.onSuccess(200, res),
       routeUtils.onError(500, res));
 });
-//
-// function onSuccess(code, res) {
-//   return function (data) {
-//     return res.status(code).json(data);
-//   };
-// }
-//
-// function onError(code, res) {
-//   return function (err) {
-//
-//     code = err.statusCode || code || 500;
-//     var name = err.name || 'Unspecified Error';
-//     var msg = err.message || err;
-//     // var errors = JSON.stringify(err.errors || []);
-//     // console.log('route error object: ' + JSON.stringify(err || ''));
-//
-//     // console.log('route errors: ' + JSON.stringify(err.errors || []));
-//
-//     // TODO: move error message normalization to the DAL.
-//     // decode ValidationError and MongoError errors.
-//
-//     var errors;
-//     if (err.errors && typeof (err.errors) === 'object' && Object.keys(err.errors).length > 0) {
-//       if (typeof (err.errors) === 'object') {
-//         // console.log('errors is object');
-//         if (Object.keys(err.errors).length > 0) {
-//           // console.log('errors has keys');
-//           errors = [];
-//
-//           var e = err.errors;
-//
-//           for (var k in e) {
-//             if (e.hasOwnProperty(k) && e[k].message) {
-//               // console.log('errors adding message: ' + e[k].message);
-//
-//               errors.push(e[k].message);
-//             }
-//           }
-//
-//         }
-//       } else if (typeof (err.errors) === 'string') {
-//         errors = err.errors;
-//       } else if (Array.isArray(err.errors)) {
-//         throw new Error('unhandled error errors list type');
-//       }
-//     }
-//
-//     // console.log('log code: ' + code);
-//     // console.log('log name: ' + name);
-//     // console.log('log msg: ' + msg);
-//     // console.log('log errors: ' + errors);
-//
-//     // console.log('log status: ' + code);
-//     // console.log('returning json');
-//     return res.status(code)
-//       .json({
-//         name: name,
-//         message: msg,
-//         errors: errors
-//       });
-//   };
-// }
 
 module.exports = router;

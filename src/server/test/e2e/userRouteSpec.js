@@ -114,6 +114,94 @@ describe('User route', function () {
     testUtils.closeConnection(mongoose, done);
   });
 
+  describe('POST /users', function () {
+    it('should create a user without passing token', function (done) {
+
+      var newUser = {
+        userName: 'testUser2',
+        password: 'hellokitty2',
+        email: 'testuser2@mail.com',
+        firstName: 'test2',
+        lastName: 'user2'
+      };
+
+      request(app)
+        .post(urlHelper.post())
+        .send(newUser)
+        .end(function (err, res) {
+          expect(res.status).to.equal(201); //201 Created
+          expect(res.header.location).to.equal(path.join(usersRootUri, res.body._id));
+          expect(res.body.userName).to.be.equal(newUser.userName);
+          expect(res.body._id).to.not.be.null;
+          done();
+        });
+    });
+
+    it('should create a user with passing token', function (done) {
+
+      var newUser = {
+        userName: 'testUser2',
+        password: 'hellokitty2',
+        email: 'testuser2@mail.com',
+        firstName: 'test2',
+        lastName: 'user2'
+      };
+
+      request(app)
+        .post(urlHelper.post())
+        .set('Authorization', 'Bearer ' + token)
+        .send(newUser)
+        .end(function (err, res) {
+          expect(res.status).to.equal(201); //201 Created
+          expect(res.header.location).to.equal(path.join(usersRootUri, res.body._id));
+          expect(res.body.userName).to.be.equal(newUser.userName);
+          expect(res.body._id).to.not.be.null;
+          done();
+        });
+    });
+
+    it('should return 500 error if no user object sent', function (done) {
+      request(app)
+        .post(urlHelper.post())
+        .set('Authorization', 'Bearer ' + token)
+        .send()
+        .end(function (err, res) {
+          expect(res.status).to.equal(500);
+          expect(res.body.name).to.equal('ValidationError');
+          expect(res.body.message).to.equal('User validation failed');
+          done();
+        });
+    });
+
+    it('should return error if user property is invalid', function (done) {
+
+      var newUser = {
+        userName: '1234567', // only 7 chars
+        password: 'hellokitty2',
+        email: 'testuser2@mail.com',
+        firstName: 'test2',
+        lastName: 'user2'
+      };
+
+      var errorMsg = 'Path `userName` (`' + newUser.userName + '`) ' +
+        'is shorter than the minimum allowed';
+
+      request(app)
+        .post(urlHelper.post())
+        .set('Authorization', 'Bearer ' + token)
+        .send(newUser)
+        .end(function (err, res) {
+          expect(res.status).to.equal(500);
+          expect(res.body).to.have.all.keys('name', 'message', 'errors');
+          expect(res.body.name).to.equal('ValidationError');
+          expect(res.body.message).to.equal('User validation failed');
+          expect(res.body.errors.length).to.equal(1);
+          expect(res.body.errors[0]).to.have.string(errorMsg);
+          done();
+        });
+    });
+  });
+
   describe('GET /users', function () {
     it('should get all users', function (done) {
       // add 1 user then get should return 2 users
@@ -125,6 +213,7 @@ describe('User route', function () {
         lastName: 'user2'
       };
 
+      // should be able to post new user without token
       request(app)
         .post(urlHelper.post())
         .set('Authorization', 'Bearer ' + token)
@@ -207,72 +296,6 @@ describe('User route', function () {
     //       done();
     //     });
     // });
-  });
-
-  describe('POST /users', function () {
-    it('should create a user', function (done) {
-
-      var newUser = {
-        userName: 'testUser2',
-        password: 'hellokitty2',
-        email: 'testuser2@mail.com',
-        firstName: 'test2',
-        lastName: 'user2'
-      };
-
-      request(app)
-        .post(urlHelper.post())
-        .set('Authorization', 'Bearer ' + token)
-        .send(newUser)
-        .end(function (err, res) {
-          expect(res.status).to.equal(201); //201 Created
-          expect(res.header.location).to.equal(path.join(usersRootUri, res.body._id));
-          expect(res.body.userName).to.be.equal(newUser.userName);
-          expect(res.body._id).to.not.be.null;
-          done();
-        });
-    });
-
-    it('should return 500 error if no user object sent', function (done) {
-      request(app)
-        .post(urlHelper.post())
-        .set('Authorization', 'Bearer ' + token)
-        .send()
-        .end(function (err, res) {
-          expect(res.status).to.equal(500);
-          expect(res.body.name).to.equal('ValidationError');
-          expect(res.body.message).to.equal('User validation failed');
-          done();
-        });
-    });
-
-    it('should return error if user property is invalid', function (done) {
-
-      var newUser = {
-        userName: '1234567', // only 7 chars
-        password: 'hellokitty2',
-        email: 'testuser2@mail.com',
-        firstName: 'test2',
-        lastName: 'user2'
-      };
-
-      var errorMsg = 'Path `userName` (`' + newUser.userName + '`) ' +
-        'is shorter than the minimum allowed';
-
-      request(app)
-        .post(urlHelper.post())
-        .set('Authorization', 'Bearer ' + token)
-        .send(newUser)
-        .end(function (err, res) {
-          expect(res.status).to.equal(500);
-          expect(res.body).to.have.all.keys('name', 'message', 'errors');
-          expect(res.body.name).to.equal('ValidationError');
-          expect(res.body.message).to.equal('User validation failed');
-          expect(res.body.errors.length).to.equal(1);
-          expect(res.body.errors[0]).to.have.string(errorMsg);
-          done();
-        });
-    });
   });
 
   describe('DELETE /users/:userId', function () {

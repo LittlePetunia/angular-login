@@ -52,14 +52,18 @@ var publicKey = 'mySecretKeyForNow';
 // var publicKey = fs.readFileSync('/pat/to/public.pub');
 app.set('jwtTokenSecret', publicKey); // so we can use this in other places
 app.use('/api', expressJwt({
-  secret: publicKey
-    //requestProperty: 'auth'
-    // ,
-    // getToken:function(req){
-    //   if(req.headers.authorization &&  req.headers.authorization.split(' ')[0] === 'Bearer'){
-    //     return req.headers.authorization.split(' ')[1];
-    //   }
-    // }
+  secret: publicKey,
+
+  //requestProperty: 'auth'
+  // ,
+  // getToken:function(req){
+  //   if(req.headers.authorization &&  req.headers.authorization.split(' ')[0] === 'Bearer'){
+  //     return req.headers.authorization.split(' ')[1];
+  //   }
+  // }
+}).unless({
+  method: 'POST',
+  path: '/api/users'
 }));
 
 app.use(bodyParser.json());
