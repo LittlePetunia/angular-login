@@ -29,7 +29,7 @@ var fakeUserId = '5536a74e354d000000000000';
 
 var urlHelper = {
   login: function (user) {
-    return '/authencticate';
+    return '/authenticate';
   },
   getMe: function () {
     return path.join(usersRootUri, 'me');

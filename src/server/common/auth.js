@@ -13,7 +13,7 @@ var publicKey = 'mySecretKeyForNow';
 // authenticates and creates session
 function authenticate(userName, password) {
 
-  console.log('authenticate');
+  // console.log('authenticate');
 
   return log.promise('authenticate',
     userDAL.getByUserNamePassword(userName, password)

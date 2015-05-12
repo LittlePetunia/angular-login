@@ -1,7 +1,0 @@
-
-basic auth working.
-
-Next:
-
-  unprotect registration page.
-    - move it to 

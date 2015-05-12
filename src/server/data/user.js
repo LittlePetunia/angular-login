@@ -83,7 +83,6 @@ module.exports = (function () {
   }
 
   function add(userId, todo) {
-    // console.log('adding a todo!!');
     todo._id = null;
     todo.userId = userId;
     var newUser = new UserModel(todo);
@@ -97,12 +96,7 @@ module.exports = (function () {
         userId: userId
       }).exec()
       .then(function (data) {
-        // console.log('delete attempted');
-
         if (!data) {
-
-          console.log('delete item not found');
-
           var error = new Error();
           error.message = 'User not found with id ' + todoId + ' for user ' + userId;
           error.statusCode = 404; // not found
@@ -114,8 +108,6 @@ module.exports = (function () {
   function update(todo) {
 
     var error;
-    // console.log('starting data todo function');
-
     if (!todo._id || !todo.userId) {
 
       error = new Error();
@@ -138,11 +130,7 @@ module.exports = (function () {
         }
 
         mongooseUtils.copyFieldsToModel(todo, dbUser);
-        //
-        // if(isWhitespaceDateValue(dbUser.dueDateTime)){
-        //   console.log('deleting dueDateTime');
-        //  dbUser.dueDateTime = '';
-        // }
+      
         return dbUser.save();
       });
   }

@@ -13,6 +13,9 @@ var usersRootUri = 'localhost:3000/api/users';
 var fakeUserId = '5536a74e354d000000000000';
 
 var urlHelper = {
+  login: function () {
+    return 'localhost:3000/authenticate';
+  },
   get: function (userId) {
     if (userId) {
       return path.join(usersRootUri, userId.toString());
@@ -36,10 +39,11 @@ var urlHelper = {
 //   });
 // }
 
-function getUsers(userId) {
+function create(user) {
   var deferred = Q.defer();
   request
-    .get(urlHelper.get(userId))
+    .post(urlHelper.post())
+    .send(user)
     .end(function (err, res) {
       if (err) {
         deferred.reject(new Error(err));
@@ -50,14 +54,51 @@ function getUsers(userId) {
   return deferred.promise;
 }
 
-function deleteUser(userId) {
+function login(user) {
   var deferred = Q.defer();
   request
-    .del(urlHelper.delete(userId))
+    .post(urlHelper.login())
+    .send({
+      userName: user.userName,
+      password: user.password
+    })
     .end(function (err, res) {
       if (err) {
         deferred.reject(new Error(err));
       } else {
+        deferred.resolve(res);
+      }
+    });
+  return deferred.promise;
+}
+
+function getUsers(userId, token) {
+  var deferred = Q.defer();
+  request
+    .get(urlHelper.get(userId))
+    .set('Authorization', 'Bearer ' + token)
+    .end(function (err, res) {
+      if (err) {
+        deferred.reject(new Error(err));
+      } else {
+        deferred.resolve(res);
+      }
+    });
+  return deferred.promise;
+}
+
+function deleteUser(userId, token) {
+  var deferred = Q.defer();
+  request
+    .del(urlHelper.delete(userId))
+    .set('Authorization', 'Bearer ' + token)
+    .end(function (err, res) {
+      if (err) {
+        console.log('error deleting user: ' + userId);
+        console.log(err);
+        deferred.reject(new Error(err));
+      } else {
+        //console.log('deleted user: ' + userId);
         deferred.resolve(res);
       }
     });
@@ -68,31 +109,62 @@ describe('Registration form', function () {
 
   // get existing items
   var dbItems;
-  beforeEach(function (done) {
-    getUsers()
+  var token;
+  var startUsersCount = 0;
+
+  var suffix = Math.floor(Math.random() * 1000);
+
+  var tokenUser = {};
+  tokenUser.userName = 'testUser' + suffix;
+  tokenUser.password = 'password11';
+  tokenUser.email = tokenUser.userName + '@mail.com';
+  tokenUser.firstName = 'test';
+  tokenUser.lastName = 'user';
+
+  // create user so i can get token for him.
+  // then delete all users
+  beforeAll(function (done) {
+    create(tokenUser)
       .then(function (res) {
-        dbItems = res.body;
+        return login(tokenUser);
+      })
+      .then(function (res) {
+        token = res.body.token;
+      })
+      .then(function (res) {
         done();
-      }, done);
+      }, function (err) {
+        console.log(err);
+        done(err);
+      });
   });
 
-  // delete them
+  // create user so i can get token for him.
+  // then delete all users
   beforeEach(function (done) {
-    if (dbItems == null || dbItems.length === 0) {
-      done();
-    }
-    var promises = dbItems.map(function (item) {
-      return deleteUser(item._id);
-    });
+    getUsers(null, token)
+      .then(function (res) {
+        if (res.body.length > 0) {
+          var promises = res.body.map(function (item) {
+            return deleteUser(item._id, token);
+          });
 
-    Q.all(promises)
-      .then(function () {
+          return Q.all(promises);
+        } else {
+          var deferred = Q.defer();
+          deferred.resolve(res);
+          return deferred.promise;
+        }
+      })
+      .then(function (res) {
         done();
-      }, done);
+      }, function (err) {
+        console.log(err);
+        done(err);
+      });
   });
 
   var page;
-  var ptor;
   beforeEach(function () {
     page = new RegistrationPage();
   });
@@ -197,10 +269,13 @@ describe('Registration form', function () {
         if (val === 0) {
           page.btnSubmit.click();
           expect($$('#userMessage.alert-success').first().isDisplayed()).toEqual(true);
-          done();
-        } else {
-          done();
         }
+      })
+      .then(function () {
+        done();
+      }, function (err) {
+        console.log(err);
+        done(err);
       });
   });
 
@@ -214,16 +289,17 @@ describe('Registration form', function () {
     page.lastName = 'user';
 
     page.btnSubmit.click();
-    // expect($$('#userMessage.alert-success').first().isDisplayed()).toEqual(true);
+    expect($$('#userMessage.alert-danger').count()).toEqual(0);
 
     browser.wait(function () {
         return browser.getCurrentUrl().then(function (url) {
-          //console.log(url);
+          // console.log(url);
           // return url.indexOf('/login') > -1;
-          return /\/login$/.test(url);
+          return /\/welcome$/.test(url);
         });
       }, 2000)
       .then(function () {
+        element(by.linkText('Logout')).click();
         page = new RegistrationPage(); // this will redirect us back to the registration page
         page.formClear();
         page.userName = 'testUser22';
@@ -237,7 +313,7 @@ describe('Registration form', function () {
       });
   });
 
-  it('should redirect to login screen after successful user creation', function () {
+  it('should login and redirect to welcome screen after successful user creation', function () {
     page.formClear();
     page.userName = 'testUser22';
     page.password = 'password11';
@@ -249,12 +325,11 @@ describe('Registration form', function () {
 
     browser.wait(function () {
         return browser.getCurrentUrl().then(function (url) {
-          //console.log(url);
-          return /\/login$/.test(url);
+          return /\/welcome$/.test(url);
         });
       }, 2000)
       .then(function () {
-        expect(true).toEqual(true);
+        expect(element(by.linkText('testUser22')).isPresent()).toEqual(true);
       });
   });
 
