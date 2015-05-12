@@ -5,8 +5,8 @@
 /* global after */
 
 process.env.NODE_ENV = 'test';
-// process.env.NODE_LOG_LEVEL = 'none';
-process.env.NODE_LOG_LEVEL = '';
+process.env.NODE_LOG_LEVEL = 'none';
+// process.env.NODE_LOG_LEVEL = '';
 
 var mongoose = require('mongoose');
 var request = require('supertest');
@@ -115,7 +115,7 @@ describe('User route', function () {
   });
 
   describe('GET /users', function () {
-    it.only('should get all users', function (done) {
+    it('should get all users', function (done) {
       // add 1 user then get should return 2 users
       var newUser = {
         userName: 'testUser2',
@@ -134,6 +134,7 @@ describe('User route', function () {
           expect(res.status).to.equal(201); //201 Created
           request(app)
             .get(urlHelper.get())
+            .set('Authorization', 'Bearer ' + token)
             .end(function (err, res) {
               expect(res.status).to.equal(200);
               expect(res.body.length).to.equal(2);
@@ -147,6 +148,7 @@ describe('User route', function () {
     it('should get a single user', function (done) {
       request(app)
         .get(urlHelper.get(user._id))
+        .set('Authorization', 'Bearer ' + token)
         .end(function (err, res) {
           expect(res.status).to.equal(200);
           expect(res).to.not.be.null;
@@ -155,9 +157,22 @@ describe('User route', function () {
         });
     });
 
+    it('should return 401 error if no token supplied', function (done) {
+      request(app)
+        .get(urlHelper.get(user._id))
+        // .set('Authorization', 'Bearer ' + token)
+        .end(function (err, res) {
+          expect(res.status).to.equal(401);
+          // expect(res).to.not.be.null;
+          // expect(res.body._id).to.be.equal(user._id.toString());
+          done();
+        });
+    });
+
     it('should return 404 if user not found', function (done) {
       request(app)
         .get(urlHelper.get(fakeUserId))
+        .set('Authorization', 'Bearer ' + token)
         .end(function (err, res) {
           expect(res.status).to.equal(404);
           expect(res.body).to.not.be.null;
@@ -165,6 +180,33 @@ describe('User route', function () {
           done();
         });
     });
+
+  });
+
+  describe('GET /users/me', function () {
+    it('should get current user', function (done) {
+      request(app)
+        .get(urlHelper.getMe())
+        .set('Authorization', 'Bearer ' + token)
+        .end(function (err, res) {
+          expect(res.status).to.equal(200);
+          expect(res).to.not.be.null;
+          expect(res.body._id).to.be.equal(user._id.toString());
+          done();
+        });
+    });
+
+    // it('should return 404 if user not found', function (done) {
+    //   request(app)
+    //     .get(urlHelper.get(fakeUserId))
+    //     .set('Authorization', 'Bearer ' + token)
+    //     .end(function (err, res) {
+    //       expect(res.status).to.equal(404);
+    //       expect(res.body).to.not.be.null;
+    //       expect(res.body.message).to.be.equal('User not found with id ' + fakeUserId);
+    //       done();
+    //     });
+    // });
   });
 
   describe('POST /users', function () {
@@ -180,6 +222,7 @@ describe('User route', function () {
 
       request(app)
         .post(urlHelper.post())
+        .set('Authorization', 'Bearer ' + token)
         .send(newUser)
         .end(function (err, res) {
           expect(res.status).to.equal(201); //201 Created
@@ -193,6 +236,7 @@ describe('User route', function () {
     it('should return 500 error if no user object sent', function (done) {
       request(app)
         .post(urlHelper.post())
+        .set('Authorization', 'Bearer ' + token)
         .send()
         .end(function (err, res) {
           expect(res.status).to.equal(500);
@@ -217,6 +261,7 @@ describe('User route', function () {
 
       request(app)
         .post(urlHelper.post())
+        .set('Authorization', 'Bearer ' + token)
         .send(newUser)
         .end(function (err, res) {
           expect(res.status).to.equal(500);
@@ -234,10 +279,12 @@ describe('User route', function () {
     it('should delete a user', function (done) {
       request(app)
         .delete(urlHelper.delete(user._id))
+        .set('Authorization', 'Bearer ' + token)
         .end(function (err, res) {
           expect(res.status).to.equal(204); //204 No Content
           request(app)
             .get(urlHelper.get(user._id))
+            .set('Authorization', 'Bearer ' + token)
             .end(function (err, res) {
               expect(res.status).to.equal(404);
               done();
@@ -248,6 +295,7 @@ describe('User route', function () {
     it('should return 404 if user not found', function (done) {
       request(app)
         .delete(urlHelper.delete(fakeUserId))
+        .set('Authorization', 'Bearer ' + token)
         .end(function (err, res) {
           expect(res.status).to.equal(404); //404 not found
           done();
@@ -268,11 +316,13 @@ describe('User route', function () {
 
       request(app)
         .put(urlHelper.put(user._id))
+        .set('Authorization', 'Bearer ' + token)
         .send(updateUser)
         .end(function (err, res) {
           expect(res.status).to.equal(200);
           request(app)
             .get(urlHelper.get(user._id))
+            .set('Authorization', 'Bearer ' + token)
             .end(function (err, res) {
               expect(res.status).to.equal(200);
               expect(res.body._id.toString()).to.equal(user._id.toString());
@@ -289,6 +339,7 @@ describe('User route', function () {
     it('should return 422 error if user object id differs from url user id', function (done) {
       request(app)
         .put(urlHelper.put(fakeUserId))
+        .set('Authorization', 'Bearer ' + token)
         .send(user)
         .end(function (err, res) {
           expect(res.status).to.equal(422); //422 Unprocessable Entity
@@ -301,6 +352,7 @@ describe('User route', function () {
       user._id = fakeUserId;
       request(app)
         .put(urlHelper.put(fakeUserId))
+        .set('Authorization', 'Bearer ' + token)
         .send(user)
         .end(function (err, res) {
           expect(res.status).to.equal(404); //422 Unprocessable Entity
