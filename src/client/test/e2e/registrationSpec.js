@@ -251,33 +251,35 @@ describe('Registration form', function () {
     expect($$('#userForm.ng-invalid').count()).toEqual(1);
   });
 
-  it('should show success popup when user is successfully submitted', function (done) {
-
-    expect(page.userMessageDiv.isDisplayed()).toEqual(false);
-
-    page.formClear();
-    page.userName = 'testUser22';
-    page.password = 'password11';
-    page.email = 'testuser11@mail.com';
-    page.firstName = 'test';
-    page.lastName = 'user';
-
-    $$('#userForm.ng-valid')
-      .count()
-      .then(function (val) {
-        expect(val).toEqual(1);
-        if (val === 0) {
-          page.btnSubmit.click();
-          expect($$('#userMessage.alert-success').first().isDisplayed()).toEqual(true);
-        }
-      })
-      .then(function () {
-        done();
-      }, function (err) {
-        console.log(err);
-        done(err);
-      });
-  });
+  // it('should show success popup when user is successfully submitted', function (done) {
+  //
+  //   expect(page.userMessageDiv.isDisplayed()).toEqual(false);
+  //
+  //   page.formClear();
+  //   page.userName = 'testUser22';
+  //   page.password = 'password11';
+  //   page.email = 'testuser11@mail.com';
+  //   page.firstName = 'test';
+  //   page.lastName = 'user';
+  //
+  //   $$('#userForm.ng-valid')
+  //     .count()
+  //     .then(function (val) {
+  //
+  //       expect(val).toEqual(1);
+  //       if (val === 1) {
+  //         page.btnSubmit.click();
+  //         expect($$('#userMessage.alert-success').count()).toEqual(1);
+  //         expect($$('#userMessage.alert-success').first().isDisplayed()).toEqual(false);
+  //       }
+  //     })
+  //     .then(function () {
+  //       done();
+  //     }, function (err) {
+  //       console.log(err);
+  //       done(err);
+  //     });
+  // });
 
   it('should show error popup when user submission fails because of duplicate username', function () {
 

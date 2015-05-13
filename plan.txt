@@ -8,8 +8,7 @@ Next:
 
   [x] make sure tests work.
 
-  [*] store token in cookie? so user can still be logged in after leaving page.
-       - for now use cookie store, I can change it later.
+  [x] store token in cookie? so user can still be logged in after leaving page.
 
   [] refactor
 

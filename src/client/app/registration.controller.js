@@ -51,36 +51,50 @@
       clearUserMessage();
       UserSvc.register(user)
         .then(function () {
-          return AuthSvc.login({
-            userName: user.userName,
-            password: user.password
-          });
-        }, function (res) {
-          var msg = 'Error creating user: ' + (res.data ? res.data.message : '');
-          if (res.data.errors && res.data.errors.length > 0) {
-            msg += ': \n' + res.data.errors.join('\n');
-          }
-          setUserMessage('error', msg);
-        });
-    }
+            return AuthSvc.login(user.userName, user.password);
+          },
+          function (res) {
 
-    function login(loginInfo) {
-      UserSvc.login(loginInfo)
+            var msg = 'Error creating user: ' + (res.data ? res.data.message : '');
+            if (res.data.errors && res.data.errors.length > 0) {
+              msg += ': \n' + res.data.errors.join('\n');
+            }
+            var formattedResponse = {
+              data: {
+                msg: msg
+              }
+            };
+            // formattedResponse.data.message = msg;
+            throw formattedResponse;
+          })
         .then(function () {
-          return UserSvc.getCurrentUser();
-        }, function (res) {
-          // TODO: is this needed? if i don't handle the error here it will still be handled later right?
-          // setUserMessage(vm.userMessageTypes.error, res.data.message);
-          return res;
-        })
-        .then(function (res) {
-          $state.go('welcome');
-        }, function (res) {
-          console.error(res);
-          setUserMessage(vm.userMessageTypes.error, res.data.message);
-        });
+            $state.go('welcome');
+          },
+          function (res) {
+            console.error(res);
+            setUserMessage(vm.userMessageTypes.error, res.data.message);
+          });
 
     }
+
+    // function login(loginInfo) {
+    //   UserSvc.login(loginInfo)
+    //     .then(function () {
+    //         return UserSvc.getCurrentUser();
+    //       },
+    //       function (res) {
+    //         // if handlint the success you must handle the error or it is not propogated.
+    //         return res;
+    //       })
+    //     .then(function (res) {
+    //         $state.go('welcome');
+    //       },
+    //       function (res) {
+    //         console.error(res);
+    //         setUserMessage(vm.userMessageTypes.error, res.data.message);
+    //       });
+    //
+    // }
 
     function setUserMessage(type, message) {
       vm.userMessage.message = message;

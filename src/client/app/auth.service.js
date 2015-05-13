@@ -58,9 +58,6 @@
             // and their error handler will not be called.
             clearUserAndToken();
             throw res; // this works!! :)
-            // var deferred = $q.defer();
-            // deferred.reject(res);
-            // return deferred.promise;
           });
     }
 
@@ -79,26 +76,24 @@
 
     function getCurrentUser() {
 
-      var deferred = $q.defer();
+      // var deferred = $q.defer();
 
       if (!isLoggedIn()) {
-        deferred.reject('User not logged in');
+        return $q.reject(new Error('User not logged in'));
 
       } else if (currentUser) {
-        deferred.resolve(currentUser);
+        return $q.when(currentUser);
 
       } else {
-        getMe()
+        return getMe()
           .then(function (res) {
             currentUser = res.data;
-            deferred.resolve(currentUser);
+            return currentUser;
           }, function (res) {
             clearUserAndToken();
-            deferred.reject(res);
+            throw res;
           });
       }
-
-      return deferred.promise;
     }
 
     function getMe() {

@@ -13,7 +13,13 @@ var publicKey = 'mySecretKeyForNow';
 // authenticates and creates session
 function authenticate(userName, password) {
 
-  // console.log('authenticate');
+  // console.log('authenticate()');
+  // if (!userName || !password) {
+  //   console.log('invalid username/password: ');
+  //   console.log(userName);
+  //   console.log(password);
+  //   log.info('authenticate', 'no match found for user/pass: ' + userName + ', ' + password);
+  // }
 
   return log.promise('authenticate',
     userDAL.getByUserNamePassword(userName, password)
@@ -22,7 +28,7 @@ function authenticate(userName, password) {
         log.info('authenticate', 'no match found for user/pass: ' + userName + ', ' + password);
 
         var error = new Error();
-        error.message = 'User not found with specified id and password';
+        error.message = 'Invalid username or password';
         error.statusCode = 404; // not found
         throw error;
       }
@@ -31,28 +37,14 @@ function authenticate(userName, password) {
 
       // TODO:  make a constant for this session duration.
       var durationMinutes = 30;
-      // var expireDateTime = utils.addMinutes(Date.now(), durationMinutes);
-      // We are sending the profile inside the token
-      var token = jwt.sign(user, publicKey, {
+      var options = {
         expiresInMinutes: durationMinutes
-          // ,
-          // audience:null,
-          // issuer:null,
-          // subject: null
+          // other options: audience, issuer, subject
+      };
 
-      });
-      // do i really have to return a promise or can I return just data?
-      var deferred = Q.defer();
-      deferred.resolve(token);
-      return deferred.promise;
-      // return log.promise('authenticate',
-      //   // sessionDAL.create({
-      //   //   userId: data._id,
-      //   //   expireDateTime: expireDateTime
-      //   // })
-      //
-      //
-      // );
+      var token = jwt.sign(user, publicKey, options);
+
+      return token;
     }));
 }
 
