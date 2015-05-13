@@ -31,10 +31,15 @@ function authenticate(userName, password) {
 
       // TODO:  make a constant for this session duration.
       var durationMinutes = 30;
-      var expireDateTime = utils.addMinutes(Date.now(), durationMinutes);
+      // var expireDateTime = utils.addMinutes(Date.now(), durationMinutes);
       // We are sending the profile inside the token
       var token = jwt.sign(user, publicKey, {
         expiresInMinutes: durationMinutes
+          // ,
+          // audience:null,
+          // issuer:null,
+          // subject: null
+
       });
       // do i really have to return a promise or can I return just data?
       var deferred = Q.defer();

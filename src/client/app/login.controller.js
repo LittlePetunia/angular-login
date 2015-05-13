@@ -4,9 +4,9 @@
   angular.module('app')
     .controller('LoginCtrl', LoginCtrl);
 
-  LoginCtrl.$inject = ['$rootScope', '$state', '$window', 'UserSvc', 'SessionSvc'];
+  LoginCtrl.$inject = ['$rootScope', '$state', 'AuthSvc'];
 
-  function LoginCtrl($rootScope, $state, $window, UserSvc, SessionSvc) {
+  function LoginCtrl($rootScope, $state, AuthSvc) {
 
     var vm = this;
     // properties
@@ -31,21 +31,18 @@
     activate();
 
     function activate() {
-      if ($window.sessionStorage.token) {
+      if (AuthSvc.isLoggedIn()) {
         $state.go('welcome');
       }
     }
 
-    function login(loginInfo) {
-      UserSvc.login(loginInfo)
-        .success(function (data, status, headers, config) {
-          $window.sessionStorage.token = data.token;
+    function login(user) {
+      AuthSvc.login(user.userName, user.password)
+        .then(function () {
           $state.go('welcome');
-        })
-        .error(function (data, status, headers, config) {
-          delete $window.sessionStorage.token;
-          setUserMessage(vm.userMessageTypes.error, data.message);
-          console.log(data, status, headers, config);
+        }, function (res) {
+          setUserMessage(vm.userMessageTypes.error, res.data.message);
+          console.log(res);
         });
     }
 

@@ -6,10 +6,12 @@ var express = require('express');
 var router = express.Router();
 var authDAL = require('../common/auth.js');
 var routeUtils = require('./routeUtils.js');
+var log = require('../common/myLog.js').create('/server/common/auth');
 
 router.post('/authenticate', function (req, res, next) {
 
-  console.log('/authenticate called with ', req.body.userName, req.body.password);
+  log.info('/authenticate', 'called with', req.body);
+
   var userInfo = req.body;
 
   authDAL.authenticate(userInfo.userName, userInfo.password)

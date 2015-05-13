@@ -6,7 +6,10 @@ Next:
 
   [x]unprotect registration page.
 
-  [] make sure tests work.
+  [x] make sure tests work.
+
+  [*] store token in cookie? so user can still be logged in after leaving page.
+       - for now use cookie store, I can change it later.
 
   [] refactor
 
@@ -21,3 +24,38 @@ Next:
   [] create roles admin/user
   [] assign rights to roles {editSelf,editAll,readSelf,readAll}
   []
+
+
+
+
+//create AuthService like so:
+http://stackoverflow.com/questions/14206492/how-do-i-store-a-current-user-context-in-angular/14206567#comment20831205_14206567
+
+app.factory( 'AuthService', function() {
+  var currentUser;
+
+  return {
+    login: function() { ... },
+    logout: function() { ... },
+    isLoggedIn: function() { ... },
+    currentUser: function() { return currentUser; }
+    ...
+  };
+});
+
+
+then controllers can use the service:
+app.controller( 'MainCtrl', function( $scope, AuthService ) {
+  $scope.$watch( AuthService.isLoggedIn, function ( isLoggedIn ) {
+    $scope.isLoggedIn = isLoggedIn;
+    $scope.currentUser = AuthService.currentUser();
+  });
+});
+
+
+// what to store in token:
+// issuer, expiration, scopes (what person can access, or maybe this could be roles), subject (user identifier)
+ "iss": "http://galaxies.com",
+  "exp": 1300819380,
+  "scopes": ["explorer", "solar-harvester", "seller"],
+  "sub": "tom@andromeda.com"

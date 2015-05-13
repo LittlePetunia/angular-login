@@ -12,34 +12,22 @@
    * authenticating a user
    * checking user authorization to resources
    */
-  UserSvc.$inject = ['$http', '$q'];
+  UserSvc.$inject = ['$http'];
 
-  function UserSvc($http, $q) {
+  function UserSvc($http) {
 
     var userUrl = '/api/users';
-    var loginUrl = '/authenticate';
 
-    function create(user) {
+    function register(user) {
       return $http.post(userUrl, user);
     }
 
-    function login(userInfo) {
-      return $http.post(loginUrl, userInfo);
-    }
-
-    function get(userId) {
-      return $http.get(userUrl + '/' + userId);
-    }
-
-    function getMe() {
-      return $http.get(userUrl + '/' + 'me');
-    }
+    // function get(userId) {
+    //   return $http.get(userUrl + '/' + userId);
+    // }
 
     return {
-      create: create,
-      get: get,
-      getMe: getMe,
-      login: login
+      register: register
     }
   }
 })(this.angular);

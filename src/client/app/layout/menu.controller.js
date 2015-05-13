@@ -5,46 +5,36 @@
     .module('app')
     .controller('MenuCtrl', MenuCtrl);
 
-  MenuCtrl.$inject = ['$window', 'SessionSvc', 'UserSvc'];
+  MenuCtrl.$inject = ['AuthSvc'];
 
-  function MenuCtrl($window, SessionSvc, UserSvc) {
+  function MenuCtrl(AuthSvc) {
 
     var vm = this;
     vm.user = null;
 
-    vm.logOut = logOut;
-    //vm.isLoggedIn = isLoggedIn;
-    // vm.menu = MenuSvc.getMenu();
+    vm.logout = logout;
 
     activate();
 
     function activate() {
-      if ($window.sessionStorage.token) {
-        UserSvc.getMe()
-          .success(function (data, status, headers, config) {
-            vm.user = data;
-          })
-          .error(function (err) {
-            console.error(err);
-          });
+      if (AuthSvc.isLoggedIn()) {
+        AuthSvc.getCurrentUser()
+          .then(function (user) {
+              vm.user = user;
+            },
+            // TODO: service should return error object with code/message
+            // basically services should abstract the http call and just return data, not the http response.
+            function (res) {
+              console.error(res);
+            });
       }
     }
 
-    // function isLoggedIn() {
-    //   return SessionSvc.hasSession();
-    // }
-
-    // function getUserInfo() {
-    //   if(isLoggedIn()){
-    //     return UserSvc.get(SessionSvc).userId;
-    //   }
-    // }
-
-    function logOut() {
-      delete $window.sessionStorage.token;
+    function logout() {
+      AuthSvc.logout();
       vm.user = null;
-      // vm.isLoggedIn = false;
     }
+
   }
 
 })(this.angular);

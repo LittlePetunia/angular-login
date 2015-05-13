@@ -4,9 +4,9 @@
   angular.module('app')
     .controller('RegistrationCtrl', RegistrationCtrl);
 
-  RegistrationCtrl.$inject = ['$rootScope', '$state', '$timeout', '$window', 'UserSvc', 'SessionSvc'];
+  RegistrationCtrl.$inject = ['$rootScope', '$state', '$timeout', 'UserSvc', 'AuthSvc'];
 
-  function RegistrationCtrl($rootScope, $state, $timeout, $window, UserSvc, SessionSvc) {
+  function RegistrationCtrl($rootScope, $state, $timeout, UserSvc, AuthSvc) {
 
     $rootScope.title = 'Register';
     var vm = this;
@@ -41,7 +41,7 @@
     activate();
 
     function activate() {
-      if ($window.sessionStorage.token) {
+      if (AuthSvc.isLoggedIn()) {
         $state.go('welcome');
       }
     }
@@ -49,26 +49,16 @@
     // functions for collecting form data and submitting new user info
     function submitUser(user) {
       clearUserMessage();
-      UserSvc.create(user)
-        .success(function (data, status, headers, config) {
-          setUserMessage('success', 'User Created! Id: ' + data._id);
-          // $state.go('login');
-          $timeout(function () {
-            setUserMessage('success', 'Logging you in....');
-            // $timeout(function () {
-            //   $state.go('login');
-            // }, 1000);
-          }, 1000);
-
-          login({
+      UserSvc.register(user)
+        .then(function () {
+          return AuthSvc.login({
             userName: user.userName,
             password: user.password
           });
-        })
-        .error(function (data, status, headers, config) {
-          var msg = 'Error creating user: ' + (data ? data.message : '');
-          if (data.errors && data.errors.length > 0) {
-            msg += ': \n' + data.errors.join('\n');
+        }, function (res) {
+          var msg = 'Error creating user: ' + (res.data ? res.data.message : '');
+          if (res.data.errors && res.data.errors.length > 0) {
+            msg += ': \n' + res.data.errors.join('\n');
           }
           setUserMessage('error', msg);
         });
@@ -76,23 +66,20 @@
 
     function login(loginInfo) {
       UserSvc.login(loginInfo)
-        .success(function (data, status, headers, config) {
-
-          $window.sessionStorage.token = data.token;
-          UserSvc.getMe()
-            .then(function (data, status, headers, config) {
-              $window.sessionStorage.user = data;
-              $state.go('welcome');
-            }, function (err) {
-              console.error(data, status, headers, config);
-              delete $window.sessionStorage.user;
-              setUserMessage(vm.userMessageTypes.error, data.message);
-            });
+        .then(function () {
+          return UserSvc.getCurrentUser();
+        }, function (res) {
+          // TODO: is this needed? if i don't handle the error here it will still be handled later right?
+          // setUserMessage(vm.userMessageTypes.error, res.data.message);
+          return res;
         })
-        .error(function (data, status, headers, config) {
-          delete $window.sessionStorage.token;
-          setUserMessage(vm.userMessageTypes.error, data.message);
+        .then(function (res) {
+          $state.go('welcome');
+        }, function (res) {
+          console.error(res);
+          setUserMessage(vm.userMessageTypes.error, res.data.message);
         });
+
     }
 
     function setUserMessage(type, message) {
