@@ -4,9 +4,9 @@
   angular.module('app')
     .controller('RegistrationCtrl', RegistrationCtrl);
 
-  RegistrationCtrl.$inject = ['$rootScope', '$state', '$timeout', 'UserSvc', 'AuthSvc'];
+  RegistrationCtrl.$inject = ['$rootScope', '$state', '$timeout', 'UserSvc', 'AuthSvc', 'NotificationSvc'];
 
-  function RegistrationCtrl($rootScope, $state, $timeout, UserSvc, AuthSvc) {
+  function RegistrationCtrl($rootScope, $state, $timeout, UserSvc, AuthSvc, NotificationSvc) {
 
     $rootScope.title = 'Register';
     var vm = this;
@@ -25,6 +25,7 @@
     // functions
     vm.submitUser = submitUser;
     vm.clearUserMessage = clearUserMessage;
+    vm.notificationTest = notificationTest;
 
     var test = true;
     // test = false;
@@ -46,6 +47,14 @@
       }
     }
 
+    var num = 0;
+
+    function notificationTest() {
+      NotificationSvc.add({
+        message: 'notification test #' + ++num
+      });
+    }
+
     // functions for collecting form data and submitting new user info
     function submitUser(user) {
       clearUserMessage();
@@ -61,7 +70,7 @@
             }
             var formattedResponse = {
               data: {
-                msg: msg
+                message: msg
               }
             };
             // formattedResponse.data.message = msg;

@@ -15,6 +15,10 @@ Next:
     [] create notification directive that can be triggered from any other controller or service
        look at paul's toast project
 
+        - create directive to render notification elements inside a div(directive element)
+        - create a service to hold notifications that directive talks to
+
+
     [] create some globaly accessible security service to manage token/session.
 
     [] create directive for login/logout/currentUser menu items

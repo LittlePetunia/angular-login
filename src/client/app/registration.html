@@ -1,9 +1,12 @@
-<div id='userMessage' class="alert " ng-class="{'alert-danger':vm.userMessage.type=='error', 'alert-success':vm.userMessage.type=='success'}" ng-show="vm.userMessage.show">
+<div id='userMessage' class="alert user-message" ng-class="{'alert-danger':vm.userMessage.type=='error', 'alert-success':vm.userMessage.type=='success'}" ng-show="vm.userMessage.show">
   <button type="button" class="close" ng-click="vm.clearUserMessage()" id="btnUserMessageClose">
     <span>&times;</span>
   </button>
   <span> {{vm.userMessage.message}}</span>
 </div>
+<!-- style="position:absolute;top:40px;right:10px; z-index:100;max-width:600px;" -->
+<!-- <notification></notification> -->
+<button class="btn btn-default" ng-click="vm.notificationTest()">Test Notification</button>
 
 <h3>Registration</h3>
 
