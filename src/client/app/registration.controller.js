@@ -4,31 +4,33 @@
   angular.module('app')
     .controller('RegistrationCtrl', RegistrationCtrl);
 
-  RegistrationCtrl.$inject = ['$rootScope', '$state', '$timeout', 'UserSvc', 'AuthSvc'];
+  RegistrationCtrl.$inject = ['$rootScope', '$state', '$timeout', 'UserSvc', 'AuthSvc', 'GlobalNotificationSvc'];
 
-  function RegistrationCtrl($rootScope, $state, $timeout, UserSvc, AuthSvc) {
+  function RegistrationCtrl($rootScope, $state, $timeout, UserSvc, AuthSvc, GlobalNotificationSvc) {
 
     $rootScope.title = 'Register';
     var vm = this;
     // properties
     vm.user = {};
-    vm.userMessageTypes = {
-      error: 'error',
-      success: 'success'
-    };
-    vm.userMessage = {
-      message: null,
-      type: null,
-      show: false
-    };
+    // vm.userMessageTypes = {
+    //   error: 'error',
+    //   success: 'success'
+    // };
+    // vm.userMessage = {
+    //   message: null,
+    //   type: null,
+    //   show: false
+    // };
 
     // functions
     vm.submitUser = submitUser;
-    vm.clearUserMessage = clearUserMessage;
-    vm.notifications = [{
-      message: 'hello kitty',
-      type: 'success'
-    }];
+    // vm.clearUserMessage = clearUserMessage;
+    vm.notifications = [];
+
+    // vm.notifications = [{
+    //   message: 'hello kitty',
+    //   type: 'success'
+    // }];
 
     var test = true;
     // test = false;
@@ -41,7 +43,8 @@
       vm.form.lastName = 'user';
     }
 
-    vm.notificationTest = notificationTest;
+    vm.localNotificationTest = localNotificationTest;
+    vm.globalNotificationTest = globalNotificationTest;
     // activation
     activate();
 
@@ -53,20 +56,21 @@
 
     var num = 0;
 
-    function notificationTest() {
-      // NotificationSvc.add({
-      //   message: 'notification test #' + ++num
-      // });
+    function globalNotificationTest() {
+      GlobalNotificationSvc.addError('Something bad happened!!');
+    }
 
+    function localNotificationTest() {
       vm.notifications.push({
         message: 'notification test #' + (++num),
-        type: 'error'
+        type: (num % 2 === 0) ? 'error' : 'success'
       });
     }
 
     // functions for collecting form data and submitting new user info
     function submitUser(user) {
-      clearUserMessage();
+      GlobalNotificationSvc.clear();
+
       UserSvc.register(user)
         .then(function () {
             return AuthSvc.login(user.userName, user.password);
@@ -90,7 +94,8 @@
           },
           function (res) {
             console.error(res);
-            setUserMessage(vm.userMessageTypes.error, res.data.message);
+            // setUserMessage(vm.userMessageTypes.error, res.data.message);
+            GlobalNotificationSvc.addError(res.data.message);
           });
 
     }
@@ -114,16 +119,16 @@
     //
     // }
 
-    function setUserMessage(type, message) {
-      vm.userMessage.message = message;
-      vm.userMessage.type = type;
-      vm.userMessage.show = true;
-    }
-
-    function clearUserMessage() {
-      vm.userMessage.message = null;
-      vm.userMessage.type = null;
-      vm.userMessage.show = false;
-    }
+    // function setUserMessage(type, message) {
+    //   vm.userMessage.message = message;
+    //   vm.userMessage.type = type;
+    //   vm.userMessage.show = true;
+    // }
+    //
+    // function clearUserMessage() {
+    //   vm.userMessage.message = null;
+    //   vm.userMessage.type = null;
+    //   vm.userMessage.show = false;
+    // }
   }
 }(this.angular));

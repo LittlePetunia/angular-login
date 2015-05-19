@@ -1,14 +1,17 @@
-<div id='userMessage' class="alert user-message" ng-class="{'alert-danger':vm.userMessage.type=='error', 'alert-success':vm.userMessage.type=='success'}" ng-show="vm.userMessage.show">
+<!-- <div id='userMessage' class="alert user-message" ng-class="{'alert-danger':vm.userMessage.type=='error', 'alert-success':vm.userMessage.type=='success'}" ng-show="vm.userMessage.show">
   <button type="button" class="close" ng-click="vm.clearUserMessage()" id="btnUserMessageClose">
     <span>&times;</span>
   </button>
   <span> {{vm.userMessage.message}}</span>
-</div>
+</div> -->
+
+<global-notification></global-notification>
 <!-- style="position:absolute;top:40px;right:10px; z-index:100;max-width:600px;" -->
 <!-- <notification></notification> -->
 
 <h3>Registration</h3>
 <!-- <notification class="right-notification" notifications="vm.notifications"></notification> -->
+<!-- <notification notifications="vm.notifications"></notification> -->
 <notification class="right-notification" notifications="vm.notifications"></notification>
 
 <br/>
@@ -79,5 +82,6 @@
     </div>
   </form>
 
-  <button style="float:right" class="btn btn-default" ng-click="vm.notificationTest()">Test Notification</button>
+  <button style="float:right" class="btn btn-default" ng-click="vm.localNotificationTest()">Local Notification</button>
+  <button style="float:right" class="btn btn-default" ng-click="vm.globalNotificationTest()">Global Notification</button>
 </div>
