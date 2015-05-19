@@ -6,10 +6,9 @@
 </div>
 <!-- style="position:absolute;top:40px;right:10px; z-index:100;max-width:600px;" -->
 <!-- <notification></notification> -->
-<button class="btn btn-default" ng-click="vm.notificationTest()">Test Notification</button>
 
 <h3>Registration</h3>
-<notification notifications="vm.notifications"></notification>
+<notification class="right-notification" notifications="vm.notifications"></notification>
 
 <br/>
 <div class="form-container-med">
@@ -78,4 +77,6 @@
       </div>
     </div>
   </form>
+
+  <button class="btn btn-default" ng-click="vm.notificationTest()">Test Notification</button>
 </div>

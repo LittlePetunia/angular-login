@@ -1,6 +1,9 @@
 /*a.link{
   cursor:pointer;
 }*/
+/*.inline {
+  display: inline;
+}*/
 
 @charset "UTF-8";
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak, .ng-hide {
@@ -22,7 +25,7 @@ ng\:form {
   display: block!important;
 }
 
-div.user-message, div.notification {
+div.user-message {
   position: absolute;
   top: 50px;
   right: 10px;
