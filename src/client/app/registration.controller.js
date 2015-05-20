@@ -12,25 +12,10 @@
     var vm = this;
     // properties
     vm.user = {};
-    // vm.userMessageTypes = {
-    //   error: 'error',
-    //   success: 'success'
-    // };
-    // vm.userMessage = {
-    //   message: null,
-    //   type: null,
-    //   show: false
-    // };
 
     // functions
     vm.submitUser = submitUser;
-    // vm.clearUserMessage = clearUserMessage;
     vm.notifications = [];
-
-    // vm.notifications = [{
-    //   message: 'hello kitty',
-    //   type: 'success'
-    // }];
 
     var test = true;
     // test = false;
@@ -45,6 +30,7 @@
 
     vm.localNotificationTest = localNotificationTest;
     vm.globalNotificationTest = globalNotificationTest;
+
     // activation
     activate();
 
@@ -86,7 +72,6 @@
                 message: msg
               }
             };
-            // formattedResponse.data.message = msg;
             throw formattedResponse;
           })
         .then(function () {
@@ -94,41 +79,8 @@
           },
           function (res) {
             console.error(res);
-            // setUserMessage(vm.userMessageTypes.error, res.data.message);
             GlobalNotificationSvc.addError(res.data.message);
           });
-
     }
-
-    // function login(loginInfo) {
-    //   UserSvc.login(loginInfo)
-    //     .then(function () {
-    //         return UserSvc.getCurrentUser();
-    //       },
-    //       function (res) {
-    //         // if handlint the success you must handle the error or it is not propogated.
-    //         return res;
-    //       })
-    //     .then(function (res) {
-    //         $state.go('welcome');
-    //       },
-    //       function (res) {
-    //         console.error(res);
-    //         setUserMessage(vm.userMessageTypes.error, res.data.message);
-    //       });
-    //
-    // }
-
-    // function setUserMessage(type, message) {
-    //   vm.userMessage.message = message;
-    //   vm.userMessage.type = type;
-    //   vm.userMessage.show = true;
-    // }
-    //
-    // function clearUserMessage() {
-    //   vm.userMessage.message = null;
-    //   vm.userMessage.type = null;
-    //   vm.userMessage.show = false;
-    // }
   }
 }(this.angular));

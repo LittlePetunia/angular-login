@@ -31,7 +31,6 @@
             while (GlobalNotificationSvc.hasNext()) {
 
               var n = GlobalNotificationSvc.next();
-              // n.notificationId = ++notificationId % 100;
               myNotifications.push(n);
 
               var html = '' +
