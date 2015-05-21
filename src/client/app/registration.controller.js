@@ -19,7 +19,7 @@
 
     var test = true;
     // test = false;
-    if (test) {
+    if(test) {
       vm.form = {};
       vm.form.userName = 'testUser1234';
       vm.form.password = 'testUser1234';
@@ -36,7 +36,7 @@
     activate();
 
     function activate() {
-      if (AuthSvc.isLoggedIn()) {
+      if(AuthSvc.isLoggedIn()) {
         $state.go('welcome');
       }
     }
@@ -48,14 +48,20 @@
     }
 
     function globalNotificationTest() {
-      GlobalNotificationSvc.addError('notification test #' + (++num));
+      GlobalNotificationSvc.add({
+        msg: 'notification test #' + (++num),
+        type: (num % 3 === 0) ? 'error' : 'success',
+        timeout: 5000
+      });
     }
+
     function singleGlobalNotificationTest() {
       GlobalNotificationSvc.add({
-        msg:'notification test #' + (++num),
+        msg: 'notification test #' + (++num),
         type: (num % 3 === 0) ? 'error' : 'success',
-        mode:'single',
-        timeout: 1000});
+        mode: 'single',
+        timeout: 5000
+      });
     }
 
     function localNotificationTest() {
@@ -76,7 +82,7 @@
           function (res) {
 
             var msg = 'Error creating user: ' + (res.data ? res.data.message : '');
-            if (res.data.errors && res.data.errors.length > 0) {
+            if(res.data.errors && res.data.errors.length > 0) {
               msg += ': \n' + res.data.errors.join('\n');
             }
             var formattedResponse = {
