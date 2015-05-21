@@ -49,18 +49,19 @@
 
     function globalNotificationTest() {
       GlobalNotificationSvc.add({
-        msg: 'notification test #' + (++num),
+        message: 'notification test #' + (++num),
         type: (num % 3 === 0) ? 'error' : 'success',
+        mode: 'multiple',
         timeout: 5000
       });
     }
 
     function singleGlobalNotificationTest() {
       GlobalNotificationSvc.add({
-        msg: 'notification test #' + (++num),
+        message: 'notification test #' + (++num),
         type: (num % 3 === 0) ? 'error' : 'success',
         mode: 'single',
-        timeout: 5000
+        timeout: 3000
       });
     }
 

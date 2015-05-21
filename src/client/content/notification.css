@@ -1,11 +1,15 @@
 
 global-notification{
   position: absolute;
-  left: 30%;
+  left: 20%;
   top: 10px;
   z-index: 10;
-  width:500px;
+  width:700px;
 }
+/*notification.top-middle-notification>div {
+  position: relative;
+}*/
+
 
 notification.right-notification {
   position: absolute;
@@ -40,6 +44,7 @@ notification.top-left-third-notification>div {
 li.notification {
   position: relative;
   list-style: none;
+
   -webkit-transition: all ease .5s;
   -o-transition: all ease .5s;
   transition: all ease .5s;
@@ -55,6 +60,10 @@ li.notification {
   max-width: 500px;
   min-height: 30px;
   box-shadow: 5px 5px 7px #aaa;
+
+  /*-webkit-transition: opacity ease .9s;
+  -o-transition: opacity ease .9s;
+  transition: opacity ease .9s;*/
 }
 
 /*global-notification>div {

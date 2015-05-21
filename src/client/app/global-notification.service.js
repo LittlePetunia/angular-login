@@ -37,10 +37,10 @@
       nextNotifications = [];
     }
 
-    function Notification(msg, type, mode, timeout, header, html) {
+    function Notification(message, type, mode, timeout, header, html) {
 
       // validation
-      if(msg == null) {
+      if(message == null) {
         throw new Error('Notification message cannot be empty/null');
       }
 
@@ -50,13 +50,14 @@
 
       if(mode) {
         if(!NotificationMode[mode]) {
-          throw new Error('Invalid message mode: ' + type);
+          throw new Error('Invalid message mode: ' + mode + '. Should be ' +
+            Object.keys(NotificationMode).join(', '));
         }
       } else {
         mode = NotificationMode.single;
       }
 
-      this.message = msg;
+      this.message = message;
       this.type = type;
       this.id = nextId();
       this.mode = mode;
@@ -67,60 +68,62 @@
       // this.header = header;
     }
 
-    function addNext(msg, type, mode, timeout, header, html) {
+    function addNext(message, type, mode, timeout, header, html) {
 
-      if(typeof msg === 'string') {
-        add(msg, type, mode, timeout, header, html, true);
+      if(typeof message === 'string') {
+        add(message, type, mode, timeout, header, html, true);
       } else {
-        // msg is config object
-        var config = msg;
+        // message is config object
+        var config = message;
         config.nextState = true;
         add(config);
       }
     }
 
-    function add(msg, type, mode, timeout, header, html, nextState) {
+    function add(message, type, mode, timeout, header, html, nextState) {
 
-      if(msg == null || typeof msg === 'string' && msg.length === 0) {
+      if(message == null || typeof message === 'string' && message.length === 0) {
         throw new Error('Notification message cannot be empty/null');
       }
 
       var n;
-      if(typeof msg === 'string') {
+      if(typeof message === 'string') {
         n = nextState ? nextNotifications : notifications;
-        n.push(new Notification(msg, type, mode, timeout, header, html));
+        n.push(new Notification(message, type, mode, timeout, header, html));
       } else {
-        // msg is config object
-        var config = msg;
+        // message is config object
+        var config = message;
         n = config.nextState ? nextNotifications : notifications;
+
+        // function Notification(message, type, mode, timeout, header, html) {
 
         n.push(new Notification(config.message, config.type, config.mode, config.timeout, config.header,
           config.html));
       }
     }
 
-    function addError(msg, mode, timeout, header, html, nextState) {
-      add(msg, NotificationType.error, mode, timeout, header, html, nextState);
+    function addError(message, mode, timeout, header, html, nextState) {
+      add(message, NotificationType.error, mode, timeout, header, html, nextState);
     }
 
-    function addSuccess(msg, mode, timeout, header, html, nextState) {
-      add(msg, NotificationType.success, mode, timeout, header, html, nextState);
+    function addSuccess(message, mode, timeout, header, html, nextState) {
+      add(message, NotificationType.success, mode, timeout, header, html, nextState);
     }
 
-    function addInfo(msg, mode, timeout, header, html, nextState) {
-      add(msg, NotificationType.info, mode, timeout, header, html, nextState);
+    function addInfo(message, mode, timeout, header, html, nextState) {
+      add(message, NotificationType.info, mode, timeout, header, html, nextState);
     }
 
-    function addNextError(msg, mode, timeout, header, html) {
-      add(msg, NotificationType.error, mode, timeout, header, html, true);
+    function addNextError(message, mode, timeout, header, html) {
+      add(message, NotificationType.error, mode, timeout, header, html, true);
     }
 
-    function addNextSuccess(msg, mode, timeout, header, html) {
-      add(msg, NotificationType.success, mode, timeout, header, html, true);
+    function addNextSuccess(message, mode, timeout, header, html) {
+      add(message, NotificationType.success, mode, timeout, header, html, true);
     }
 
-    function addNextInfo(msg, mode, timeout, header, html) {
-      add(msg, NotificationType.info, mode, timeout, header, html, true);
+    function addNextInfo(message, mode, timeout, header, html) {
+      add(message, NotificationType.info, mode, timeout, header, html, true);
     }
 
     function clear() {
