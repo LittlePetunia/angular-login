@@ -18,43 +18,51 @@
       info: 'info'
     };
 
+    var NotificationMode = {
+      single: 'single',
+      multiple: 'multiple'
+    };
+
     function nextId() {
       id = (id + 1) % 100;
       return id;
     }
 
-    function Notification(msg, type, timeoutMs, header, html) {
+    function Notification(msg, type, mode, timeout, header, html) {
       this.message = msg;
       this.type = type;
       this.id = nextId();
+      this.mode = mode;
 
-      // this.timeout = timeoutMs;
+      this.timeout = timeout;
       // implement this later
       // this.html = html;
       // this.header = header;
     }
 
-    function add(msg, type, timeoutMs, header, html) {
-      notifications.push(new Notification(msg, type, timeoutMs, header, html));
+    function add(msg, type, mode, timeout, header, html) {
+      if(typeof msg === 'string')
+      {
+        notifications.push(new Notification(msg, type, mode,timeout, header, html));
+      }
+      else{
+        // msg is config object
+        var config = msg;
+        notifications.push(new Notification(config.msg, config.type, config.mode,config.timeout, config.header, config.html));
+      }
     }
 
-    function addError(msg, timeout) {
-      add(msg, NotificationType.error, timeout);
+    function addError(msg, mode,timeout) {
+      add(msg, NotificationType.error, timeout, mode);
     }
 
-    function addSuccess(msg, timeout) {
-      add(msg, NotificationType.success, timeout);
+    function addSuccess(msg, mode,timeout) {
+      add(msg, NotificationType.success, timeout, mode);
     }
 
-    function addInfo(msg, timeout) {
-      add(msg, NotificationType.info, timeout);
+    function addInfo(msg, mode,timeout) {
+      add(msg, NotificationType.info, timeout, mode);
     }
-
-    // function removeAll() {
-    //   var ret = angular.copy(notifications);
-    //   clear();
-    //   return ret;
-    // }
 
     function clear() {
       setClearSignal(true);
@@ -84,13 +92,14 @@
     }
 
     return {
+      add: add,
       addError: addError,
       addSuccess: addSuccess,
       addInfo: addInfo,
-      clear: clear,
       count: count,
       hasNext: hasNext,
       next: next,
+      clear: clear,
       getClearSignal: getClearSignal,
       setClearSignal: setClearSignal
     };

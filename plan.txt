@@ -17,12 +17,14 @@ Next:
 
         - [x]create directive to render notification elements inside a div(directive element)
         - [x]create a service to hold notifications that directive talks to
-        - refactor login page to use global service and comment out use of local notification.
+        - [x]refactor login page to use global service and comment out use of local notification.
         - add ability to set notification for next state
           - need notification list in service for next state
           - need a way to know when state change happens so we can change lists
-          
-        - add timeout feature
+
+        - [] add timeout feature
+          - working for click event but not when triggered from directive at creation time.
+
         - add html feature
         - add header feature
         - add icon?
@@ -37,6 +39,12 @@ Next:
   []
 
 
+problem with notification directive is that i cannot clear the items on demand.
+They are not associated with a model object by design so that I can fade them out.
+options:
+- give notification elements an id so I can manipulate them from directive
+- associate element with a scope item (does this have to be a real scope?) and then
+  to delete will delete the model item after a timeout
 
 
 //create AuthService like so:

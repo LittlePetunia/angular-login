@@ -30,8 +30,9 @@
 
     vm.localNotificationTest = localNotificationTest;
     vm.globalNotificationTest = globalNotificationTest;
+    vm.globalNotificationClear = globalNotificationClear;
+    vm.singleGlobalNotificationTest = singleGlobalNotificationTest;
 
-    // activation
     activate();
 
     function activate() {
@@ -42,8 +43,19 @@
 
     var num = 0;
 
+    function globalNotificationClear() {
+      GlobalNotificationSvc.clear();
+    }
+
     function globalNotificationTest() {
-      GlobalNotificationSvc.addError('Something bad happened!!');
+      GlobalNotificationSvc.addError('notification test #' + (++num));
+    }
+    function singleGlobalNotificationTest() {
+      GlobalNotificationSvc.add({
+        msg:'notification test #' + (++num),
+        type: (num % 3 === 0) ? 'error' : 'success',
+        mode:'single',
+        timeout: 1000});
     }
 
     function localNotificationTest() {
