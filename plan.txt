@@ -18,11 +18,13 @@ Next:
         - [x]create directive to render notification elements inside a div(directive element)
         - [x]create a service to hold notifications that directive talks to
         - [x]refactor login page to use global service and comment out use of local notification.
+        - [] add way to clear notifications when state changes.
+
         - add ability to set notification for next state
           - need notification list in service for next state
           - need a way to know when state change happens so we can change lists
 
-        - [] add timeout feature
+        - [x] add timeout feature
           - working for click event but not when triggered from directive at creation time.
 
         - add html feature

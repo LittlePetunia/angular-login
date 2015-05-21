@@ -21,7 +21,7 @@
     activate();
 
     function activate() {
-      if (AuthSvc.isLoggedIn()) {
+      if(AuthSvc.isLoggedIn()) {
         $state.go('welcome');
       }
     }
@@ -30,8 +30,18 @@
       AuthSvc.login(user.userName, user.password)
         .then(function () {
           $state.go('welcome');
+          GlobalNotificationSvc.add({
+            message: 'Login Successful',
+            type: 'success',
+            nextState: true,
+            timeout: 2000
+          });
         }, function (res) {
-          GlobalNotificationSvc.addError(res.data.message);
+          GlobalNotificationSvc.add({
+            message: res.data.message,
+            type: 'error',
+            mode: 'single'
+          });
           console.log(res);
         });
     }

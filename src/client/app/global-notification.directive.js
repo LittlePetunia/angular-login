@@ -4,43 +4,46 @@
   angular.module('app')
     .directive('globalNotification', globalNotification);
 
-  globalNotification.$inject = ['$compile', '$timeout', 'GlobalNotificationSvc'];
+  globalNotification.$inject = ['$rootScope', '$compile', '$timeout', 'GlobalNotificationSvc'];
 
-  function globalNotification($compile, $timeout, GlobalNotificationSvc) {
+  function globalNotification($rootScope, $compile, $timeout, GlobalNotificationSvc) {
+
+    $rootScope.$on('$stateChangeSuccess', function () {
+      GlobalNotificationSvc.setNextSignal(true);
+
+    });
 
     return {
       restrict: 'E',
-      scope: {
-
-      },
+      scope: {},
 
       link: function (scope, element, attrs) {
 
         var removedNotifications = {};
-        scope.globalNotifications = {};
-        var idSuffix = 'gn_';
+        var globalNotifications = {};
 
         function removeNotification(id) {
           var el = element.find('li[data-notificationId="' + id + '"]');
           if(el.length > 0) {
             el.remove();
           }
-          removedNotifications[id] = scope.globalNotifications[id];
-          delete scope.globalNotifications[id];
-        }
 
-        function restoreNotification(id) {
-          scope.globalNotifications[id] = removedNotifications[id];
-          delete scope.removedNotifications[id];
-          // then need to render it preferably in same position....
+          removedNotifications[id] = globalNotifications[id];
+          delete globalNotifications[id];
         }
 
         function clearNotifications() {
-          for(var key in scope.globalNotifications) {
-            if(scope.globalNotifications.hasOwnProperty(key)) {
+          for(var key in globalNotifications) {
+            if(globalNotifications.hasOwnProperty(key)) {
               removeNotification(key);
             }
           }
+        }
+
+        function restoreNotification(id) {
+          globalNotifications[id] = removedNotifications[id];
+          delete scope.removedNotifications[id];
+          // then need to render it preferably in same position....
         }
 
         $(element).append('<div><ul></ul></div>');
@@ -48,9 +51,21 @@
 
         // watch clear signal
         scope.$watch(function () {
+            var nextSignal = GlobalNotificationSvc.getNextSignal();
+            return nextSignal;
+          },
+          function (newVal, oldVal) {
+            if(newVal) {
+              clearNotifications();
+              GlobalNotificationSvc.switchToNext();
+            }
+          }
+        );
+
+        // watch clear signal
+        scope.$watch(function () {
             return GlobalNotificationSvc.getClearSignal();
           },
-          // function (newVal, oldVal) {
           function (newVal, oldVal) {
             if(newVal) {
               clearNotifications();
@@ -63,7 +78,6 @@
         scope.$watch(function () {
             return GlobalNotificationSvc.count();
           },
-          // function (newVal, oldVal) {
           function () {
 
             while(GlobalNotificationSvc.hasNext()) {
@@ -73,7 +87,7 @@
                 clearNotifications();
               }
 
-              scope.globalNotifications[n.id] = n;
+              globalNotifications[n.id] = n;
 
               var html = '' +
                 '<li class="notification notification-new notification-' + n.type + '"' +

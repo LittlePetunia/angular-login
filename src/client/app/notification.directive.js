@@ -26,7 +26,7 @@
           // function (newVal, oldVal) {
           function () {
 
-            while (scope.notifications.length > 0) {
+            while(scope.notifications.length > 0) {
 
               var n = scope.notifications.pop();
               myNotifications.push(n);
@@ -46,14 +46,14 @@
         $(element).on('click', 'li button', function (evt) {
 
           var el = $(evt.currentTarget).closest('li');
-          if (el.hasClass('notification-removed')) {
+          if(el.hasClass('notification-removed')) {
             return;
           }
 
           var id = parseInt(el.attr('data-notificationId'));
 
-          for (var i = 0; i < myNotifications.length; i++) {
-            if (myNotifications[i].notificationId === id) {
+          for(var i = 0; i < myNotifications.length; i++) {
+            if(myNotifications[i].notificationId === id) {
               removedNotifications.push(myNotifications.splice(i, 1));
             }
           }
