@@ -11,6 +11,8 @@
 
     $urlRouterProvider.otherwise('/welcome');
 
+    // TODO: top-nav is static so I think I can specify template on the directive
+    // and then specify controller on template and then not keep giving for each route.
     $stateProvider
       .state('welcome', {
         url: '/welcome',

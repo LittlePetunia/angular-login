@@ -4,66 +4,136 @@
   angular.module('app')
     .directive('notification', notification);
 
-  function notification() {
+  notification.$inject = ['$timeout', 'GlobalNotificationSvc'];
+
+  function notification($timeout, GlobalNotificationSvc) {
 
     return {
       restrict: 'E',
       scope: {
-        notifications: '='
+        notifications: '=',
+        global: '@'
       },
 
       link: function (scope, element, attrs) {
 
-        var removedNotifications = [];
-        var myNotifications = [];
-        var notificationId = 0;
+        var source;
+        if(scope.global) {
+          source = GlobalNotificationSvc;
+        } else if(scope.notifications) {
+          source = scope.notifications;
+        }
+
+        var removedNotifications = {};
+        var myNotifications = {};
+
+        // watch next signal
+        scope.$watch(function () {
+            var nextSignal = source.getNextSignal();
+            return nextSignal;
+          },
+          function (newVal, oldVal) {
+            if(newVal) {
+              clearNotifications();
+              source.switchToNext();
+            }
+          }
+        );
+
+        // watch clear signal
+        scope.$watch(function () {
+            return source.getClearSignal();
+          },
+          function (newVal, oldVal) {
+            if(newVal) {
+              clearNotifications();
+              source.setClearSignal(false);
+            }
+          }
+        );
 
         $(element).append('<div><ul></ul></div>');
+        var ul = $(element).find('ul');
 
+        // watch notification count
         scope.$watch(function () {
-            return scope.notifications ? scope.notifications.length : 0;
+            return source.count();
           },
-          // function (newVal, oldVal) {
           function () {
 
-            while(scope.notifications.length > 0) {
+            while(source.hasNext()) {
 
-              var n = scope.notifications.pop();
-              myNotifications.push(n);
-              n.notificationId = ++notificationId;
+              var n = source.next();
+              if(n.mode === 'single') {
+                clearNotifications();
+              }
+
+              myNotifications[n.id] = n;
 
               var html = '' +
-                '<li class="notification notification-new notification-' + n.type + '" data-notificationId=\'' +
-                n.notificationId + '\'>' +
+                '<li class="notification notification-new notification-' + n.type + '"' +
+                ' data-notificationId="' + n.id + '">' +
                 '<button class="notification-close" >&times;</button>' +
                 '<span class="notification-text">' + n.message + '</span>' +
                 '</li>';
 
-              $(element).find('ul').append(html);
+              ul.append(html);
+
+              if(n.timeout) {
+                var el = ul.children('li').last();
+                removeElement(el[0], n.id, n.timeout);
+              }
             }
           });
+
+        function removeNotification(id) {
+          var el = element.find('li[data-notificationId="' + id + '"]');
+          if(el.length > 0) {
+            el.remove();
+          }
+
+          removedNotifications[id] = myNotifications[id];
+          delete myNotifications[id];
+        }
+
+        function clearNotifications() {
+          for(var key in myNotifications) {
+            if(myNotifications.hasOwnProperty(key)) {
+              removeNotification(key);
+            }
+          }
+        }
+
+        function restoreNotification(id) {
+          myNotifications[id] = removedNotifications[id];
+          delete removedNotifications[id];
+          // then need to render it preferably in same position....
+        }
+
+        function removeElement(el, notificationId, timeout) {
+
+          $timeout(function () {
+
+            $(el).toggleClass('notification-new notification-removed')
+              .one('webkitTransitionEnd oTransitionEnd transitionend', function (e) {
+                removeNotification(notificationId);
+              });
+          }, timeout, false);
+        }
 
         $(element).on('click', 'li button', function (evt) {
 
           var el = $(evt.currentTarget).closest('li');
           if(el.hasClass('notification-removed')) {
+            // handle multiple clicks while transitionining
             return;
           }
 
           var id = parseInt(el.attr('data-notificationId'));
-
-          for(var i = 0; i < myNotifications.length; i++) {
-            if(myNotifications[i].notificationId === id) {
-              removedNotifications.push(myNotifications.splice(i, 1));
-            }
-          }
-
-          el.toggleClass('notification-new notification-removed')
-            .one('webkitTransitionEnd oTransitionEnd transitionend', function (e) {
-              el.remove();
-            });
+          removeElement(el, id);
         });
       }
+
     };
   }
 

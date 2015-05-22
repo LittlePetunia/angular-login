@@ -1,5 +1,5 @@
 
-global-notification{
+notification.top-left-float-notification {
   position: absolute;
   left: 20%;
   top: 10px;
@@ -71,7 +71,7 @@ li.notification {
   left: -50%;
 }*/
 
-notification li button.notification-close, global-notification li button.notification-close {
+notification li button.notification-close {
   font-weight: bold;
   font-size: 21px;
   color: #000;
