@@ -24,6 +24,7 @@ ng\:form {
   display: block!important;
 }*/
 
+/*TODO: user-message/removed not used anymore so remove */
 div.user-message {
   position: absolute;
   top: 50px;

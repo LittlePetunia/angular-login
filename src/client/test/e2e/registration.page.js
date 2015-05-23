@@ -18,10 +18,7 @@ RegistrationPage.prototype = Object.create({}, {
   firstName: getSetById('firstName'),
   lastName: getSetById('lastName'),
 
-  btnSubmit: getById('btnSubmit'),
-
-  userMessageDiv: getById('userMessage'),
-  userMessageCloseButton: getById('btnUserMessageClose')
+  btnSubmit: getById('btnSubmit')
 
 });
 
@@ -31,7 +28,7 @@ RegistrationPage.prototype.formClear = function () {
   this.email.clear();
   this.firstName.clear();
   this.lastName.clear();
-}
+};
 
 function getSetById(id) {
   return {

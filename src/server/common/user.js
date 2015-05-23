@@ -1,4 +1,5 @@
 'use strict';
+// TODO: move this into 'data-access' dir
 
 var mongoose = require('mongoose');
 var uniqueValidator = require('mongoose-unique-validator');
@@ -24,7 +25,7 @@ function getById(userId) {
     .select(userFields)
     .exec()
     .then(function (dbUser) {
-      if (!dbUser) {
+      if(!dbUser) {
         var error = new Error();
         error.message = 'User not found with id ' + userId;
         error.statusCode = 404; // not found
@@ -61,7 +62,7 @@ function deleteById(userId) {
       _id: userId
     }).exec()
     .then(function (data) {
-      if (!data) {
+      if(!data) {
         var error = new Error();
         error.message = 'User not found with id ' + userId;
         error.statusCode = 404; // not found
@@ -75,7 +76,7 @@ function update(user) {
 
   var error;
 
-  if (!user._id) {
+  if(!user._id) {
     var promise = new mongoose.Promise();
 
     error = new Error();

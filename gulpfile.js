@@ -13,138 +13,63 @@ var gulp = require('gulp'),
   karma = require('karma').server,
   protractor = require('gulp-protractor').protractor,
   browserSync = require('browser-sync'),
-  nodemon = require('gulp-nodemon');
-
-var filePaths = {
-  appJS: 'public/ang/*.js',
-  //unitTestJS: 'public/ang/test/unit/*test-unit.js',
-  e2eTestJS: 'src/client/test/e2e/*test-e2e.js'
-};
+  nodemon = require('gulp-nodemon'),
+  mocha = require('gulp-spawn-mocha'),
+  runSequence = require('run-sequence');
 
 // jshint
-gulp.task('jshint-run', function () {
-  return gulp.src('public/ang/**/*.js')
+gulp.task('jshint', function () {
+  return gulp.src('src/client/**/*.js')
     .pipe(jshint('.jshintrc'))
     .pipe(jshint.reporter('jshint-stylish'));
 });
 
-// gulp.task('jshint-watch', function(){
-//   gulp.watch(filePaths.appJS, ['jshint-run']);
-// });
-
-gulp.task('serve-dev', function () {
-  serve({
-    mode: 'dev'
-  });
+gulp.task('jshint-watch', function () {
+  return gulp.watch(['src/client/**/*.js'], ['jshint']);
 });
 
-// karma
-gulp.task('karma-run', ['jshint-run'], function (done) {
-  karma.start({
+gulp.task('karma', function (done) {
+  return karma.start({
     configFile: __dirname + '/karma.conf.js'
   }, done);
 });
 
-gulp.task('protractor-run', function () {
-  return gulp.src([filePaths.e2eTestJS])
+gulp.task('protractor', function () {
+  return gulp.src(['src/client/test/e2e/*test-e2e.js'])
     .pipe(protractor({
       'configFile': 'protractor.conf.js'
     }))
-    // .on('error', function(e) { throw e });
     .on('error', function (e) {
       gutil.log(e.message);
     });
+});
 
+gulp.task('mocha', function () {
+  return gulp
+    .src(['src/server/test/e2e/*.*Spec.js'])
+    .pipe(mocha({
+      istanbul: true
+    }));
 });
 
 gulp.task('protractor-watch', function () {
-  gulp.watch(['src/client/**/*.js',
-    'src/client/**/*.html',
-    'src/client/**/*.css',
-    './protractor.conf.js'
-  ], ['protractor-run']);
+  gulp.watch(['src/client/**/*.*', './protractor.conf.js'], ['protractor']);
 });
 
-// gulp.task('protractor-watch', function () {
-//   gulp.watch(['src/client/**/*.js',
-//     'src/client/**/*.html',
-//     'src/client/**/*.css',
-//     './protractor.conf.js'
-//   ], ['protractor-run', 'karma-run', 'jshint-run']);
-// });
+gulp.task('mocha-watch', function () {
+  gulp.watch(['src/server/**/*.js'], ['mocha']);
+});
+
+gulp.task('karma-watch', function () {
+  return gulp.watch(['src/client/**/*.js'], ['karma']);
+});
+
+// TODO: need to make sure the node server is running before karma
+gulp.task('test', function (cb) {
+  runSequence('protractor', 'karma', 'mocha', cb);
+});
 
 gulp.task('browser-sync', function () {
-  startBrowserSync();
-  // browserSync.init({
-  //   server:{
-  //     baseDir:'./',
-  //     proxy: 'localhost:3000',
-  //     files: 'src/client/**/*.*'
-  //   }
-  // });
-});
-
-// // create a default task and just log a message
-// gulp.task('running-log', function() {
-//   gutil.log('Gulp is running!');
-// });
-
-gulp.task('default', [
-  // 'browser-sync',
-  'jshint-run',
-  //'karma-run',
-  //'protractor-run',
-
-  //'jshint-watch',
-  'protractor-watch'
-]);
-
-/**
- * Start the node server using nodemon.
- * Optionally start the node debugging.
- * @param  {Object} args - debugging arguments
- * @return {Stream}
- */
-function serve(args) {
-  var options = {
-    script: './src/server/bin/www',
-    delayTime: 1,
-    env: {
-      'NODE_ENV': args.mode,
-      'PORT': 3000
-    },
-    watch: ['./src/server/**/*.*']
-  };
-
-  var exec;
-  // if (args.debug) {
-  //     log('Running node-inspector. Browse to http://localhost:8080/debug?port=5858');
-  //     exec = require('child_process').exec;
-  //     exec('node-inspector');
-  //     options.nodeArgs = [args.debug + '=5858'];
-  // }
-
-  return nodemon(options)
-    .on('start', function () {
-      startBrowserSync();
-    })
-    //.on('change', tasks)
-    .on('restart', function () {
-      // log('restarted!');
-      setTimeout(function () {
-        browserSync.reload({
-          stream: false
-        });
-      }, 1000);
-    });
-}
-
-function startBrowserSync() {
-  // if(!env.browserSync || browserSync.active) {
-  //     return;
-  // }
-
-  // log('Starting BrowserSync on port ' + port);
   browserSync({
     proxy: 'localhost:' + 3000,
     port: 3000,
@@ -160,4 +85,8 @@ function startBrowserSync() {
     notify: true,
     reloadDelay: 0 //ms
   });
-}
+});
+
+gulp.task('default', function (cb) {
+  runSequence('browser-sync', 'jshint-watch', 'karma-watch', 'mocha-watch', cb);
+});

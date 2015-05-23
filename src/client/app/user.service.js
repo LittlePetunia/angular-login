@@ -28,6 +28,6 @@
 
     return {
       register: register
-    }
+    };
   }
 })(this.angular);

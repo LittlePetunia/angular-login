@@ -1,5 +1,5 @@
 'use strict';
-
+// TODO: move this into 'data-access' dir
 var mongoose = require('mongoose');
 // var uniqueValidator = require('mongoose-unique-validator');
 // var idvalidator = require('mongoose-id-validator');
@@ -28,7 +28,7 @@ function create(session) {
 
 function update(session) {
   // console.log('update() session._id ' + session._id);
-  if (!session._id) {
+  if(!session._id) {
     var promise = new mongoose.Promise();
     var error = new Error();
     error.message = 'update operation requires session object to have _id value';
@@ -40,7 +40,7 @@ function update(session) {
   return log.promise('update',
     get(session._id)
     .then(function (data) {
-      if (!data) {
+      if(!data) {
         var error = new Error();
         error.message = 'Session not found with id ' + session._id;
         error.statusCode = 404; // not found
