@@ -7,7 +7,7 @@ var _ = require('underscore');
 
 var mongooseUtils = require('../common/mongooseUtils.js');
 var UserModel = require('../db-models/user.js');
-var log = require('./myLog.js').create('/server/common/user');
+var log = require('../common/myLog.js').create('/server/db-access/user');
 
 var userFields = 'userId userName email firstName lastName';
 

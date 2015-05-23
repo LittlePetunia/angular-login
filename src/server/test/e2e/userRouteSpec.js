@@ -15,7 +15,7 @@ var expect = require('chai').expect;
 var path = require('path');
 
 var testUtils = require('../../common/testUtils.js');
-var userDAL = require('../../common/user.js');
+var userDAL = require('../../data-access/user.js');
 var authDAL = require('../../common/auth.js');
 
 var app = require('../../app.js');
@@ -35,7 +35,7 @@ var urlHelper = {
     return path.join(usersRootUri, 'me');
   },
   get: function (userId) {
-    if (userId) {
+    if(userId) {
       return path.join(usersRootUri, userId.toString());
     }
     return path.join(usersRootUri);

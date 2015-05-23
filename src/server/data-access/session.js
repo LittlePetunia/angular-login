@@ -1,10 +1,8 @@
 'use strict';
-// TODO: move this into 'data-access' dir
+
 var mongoose = require('mongoose');
-// var uniqueValidator = require('mongoose-unique-validator');
-// var idvalidator = require('mongoose-id-validator');
 var _ = require('underscore');
-var log = require('./myLog.js').create('/server/common/session');
+var log = require('../common/myLog.js').create('/server/data-access/session');
 var SessionModel = require('../db-models/session.js');
 
 function get(id) {

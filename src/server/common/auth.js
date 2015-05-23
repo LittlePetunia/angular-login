@@ -1,7 +1,7 @@
 'use strict';
 
-var userDAL = require('./user.js');
-var sessionDAL = require('./session.js');
+var userDAL = require('../data-access/user.js');
+var sessionDAL = require('../data-access/session.js');
 var utils = require('./utils.js');
 var log = require('./myLog.js').create('/server/common/auth');
 var jwt = require('jsonwebtoken');
@@ -24,7 +24,7 @@ function authenticate(userName, password) {
   return log.promise('authenticate',
     userDAL.getByUserNamePassword(userName, password)
     .then(function (user) {
-      if (!user) {
+      if(!user) {
         log.info('authenticate', 'no match found for user/pass: ' + userName + ', ' + password);
 
         var error = new Error();

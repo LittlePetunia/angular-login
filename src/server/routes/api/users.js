@@ -5,7 +5,7 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
-var User = require('./../../common/user.js');
+var User = require('../../data-access/user.js');
 var routeUtils = require('../routeUtils.js');
 
 var path = require('path');
@@ -65,9 +65,9 @@ router.put('/users/:userId', function (req, res, next) {
   var userId = req.params.userId;
   var user = req.body;
 
-  if (user._id == null) {
+  if(user._id == null) {
     user._id = userId;
-  } else if (user._id.toString() !== userId.toString()) {
+  } else if(user._id.toString() !== userId.toString()) {
     return res.status(422) //422 Unprocessable Entity
       .json({
         message: 'id of object does not match id in path.' + ' object _id: ' + user._id + ' path id: ' + userId
