@@ -14,8 +14,7 @@
 
     vm.logout = logout;
 
-    activate();;;;
-    hello;
+    activate();
 
     function activate() {
       if(AuthSvc.isLoggedIn()) {
