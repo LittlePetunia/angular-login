@@ -3,8 +3,13 @@ basic auth working.
 
 Next:
 
+  [] create dist build process
+    [] update node server so it serves correct static files based on environment: dev, test, build.
+    [] create gulp tasks to run tests on test/build environments.
+    [] can I just always build to dist in realtime and use for testing dev and pro? 
 
-  [x]unprotect registration page.
+
+  [x] unprotect registration page.
 
   [x] make sure tests work.
 
@@ -41,15 +46,8 @@ Next:
 
   [] create roles admin/user
   [] assign rights to roles {editSelf,editAll,readSelf,readAll}
-  []
+  [] main controller needs to watch AuthSvc.isLoggedIn so if a user logs out on one tab the change is noticed on second tab.
 
-
-problem with notification directive is that i cannot clear the items on demand.
-They are not associated with a model object by design so that I can fade them out.
-options:
-- give notification elements an id so I can manipulate them from directive
-- associate element with a scope item (does this have to be a real scope?) and then
-  to delete will delete the model item after a timeout
 
 
 //create AuthService like so:
