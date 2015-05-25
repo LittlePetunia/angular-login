@@ -7,9 +7,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <!-- inject-vendor:css -->
   <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css">
   <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap-theme.css">
+  <!-- endinject -->
 
   <link rel="stylesheet" href="/content/app-style.css">
   <link rel="stylesheet" href="/content/notification.css">
@@ -27,7 +28,8 @@
 
   <div ui-view="main-content"></div>
 
-  <!-- placed at end of document so document loads faster -->
+  <!-- inject-vendor:js -->
+
   <!-- jquery has to be before bootstrap -->
   <script src="/bower_components/jquery/dist/jquery.js"></script>
   <script src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
@@ -38,9 +40,10 @@
   <script src="/bower_components/angular-resource/angular-resource.js"></script>
   <script src="/bower_components/moment/moment.js"></script>
   <script src="/bower_components/angular-cookies/angular-cookies.js"></script>
+  <!-- endinject -->
 
   <!-- app angular scripts -->
-  <!-- I read you should import modules first. ?even though they might depend on services not loaded yet? -->
+  <!-- Import modules first -->
 
   <script src="/app/app.module.js"></script>
   <!-- inject:js -->
@@ -55,7 +58,6 @@
   <script src="/app/notification.directive.js"></script>
   <script src="/app/notification.service.js"></script>
   <script src="/app/global-notification.service.js"></script>
-  <!-- <script src="/app/global-notification.directive.js"></script> -->
 
 </body>
 

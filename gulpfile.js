@@ -18,7 +18,8 @@ var gulp = require('gulp'),
   runSequence = require('run-sequence'),
   del = require('del'),
   angularTemplatecache = require('gulp-angular-templatecache'),
-  inject = require('gulp-inject');
+  inject = require('gulp-inject'),
+  path = require('path');
 
 var paths = {
   css: './src/client/content/*.css',
@@ -27,11 +28,23 @@ var paths = {
   indexHtml: './src/client/index.html',
   js: './src/client/app/**/*.js',
   bower: './bower_components/**',
+  vendorCss: ['./bower_components/bootstrap/dist/css/bootstrap.css',
+    './bower_components/bootstrap/dist/css/bootstrap-theme.css'
+  ],
+  vendorJs: ['./bower_components/jquery/dist/jquery.js',
+    './bower_components/bootstrap/dist/js/bootstrap.js',
+    './bower_components/angular/angular.js',
+    './bower_components/angular-ui-router/release/angular-ui-router.js',
+    './bower_components/angular-resource/angular-resource.js',
+    './bower_components/moment/moment.js',
+    './bower_components/angular-cookies/angular-cookies.js'
+  ],
   build: './dist/'
 };
 
 var fileNames = {
-  htmlTemplates: 'templates.js'
+  htmlTemplates: 'templates.js',
+  indexHtml: 'index.html'
 };
 
 gulp.task('clean', function (cb) {
@@ -47,8 +60,32 @@ gulp.task('copy-js', ['clean', 'jshint'], function () {
   return gulp
     .src(paths.js)
     .pipe(gulp.dest(paths.build + 'app/'));
-
 });
+
+gulp.task('copy-vendor-css', ['clean'], function () {
+  return gulp
+    .src(paths.vendorCss)
+    //.pipe(gulp.dest(paths.build + 'bower_components/'));
+    .pipe(gulp.dest(function (file) {
+      // I am not loving this solution.
+      return path.join(paths.build, file.path.substring(
+        file.path.indexOf('bower_components'),
+        file.path.lastIndexOf('/')));
+    }));
+});
+
+gulp.task('copy-vendor-js', ['clean'], function () {
+  return gulp
+    .src(paths.vendorJs)
+    //.pipe(gulp.dest(paths.build + 'bower_components/'));
+    .pipe(gulp.dest(function (file) {
+      // I am not loving this solution.
+      return path.join(paths.build, file.path.substring(
+        file.path.indexOf('bower_components'),
+        file.path.lastIndexOf('/')));
+    }));
+});
+
 gulp.task('copy-img', ['clean'], function () {
   return gulp
     .src(paths.img)
@@ -78,20 +115,44 @@ gulp.task('inject-angular-templates', ['htmlTemplates'], function () {
   return gulp
     .src(paths.indexHtml)
     .pipe(inject(gulp.src('app/' + fileNames.htmlTemplates, {
-      cwd: paths.build
+      cwd: paths.build,
+      read: false
     })))
     .pipe(gulp.dest(paths.build));
 });
 
-gulp.task('copy-bower-components', ['clean'], function () {
-  // TODO: this can be way more selective and just copy the
-  //       specific files we use instead of the entire directory of min/zip/map... files.
-  gulp.src(paths.bower)
-    .pipe(gulp.dest('dist/bower_components'));
-});
+/*
+  file paths are the same in dist as in dev so no need to inject new file path.
+  We could do it but then need to maintain order. When we do this for real will
+  concattenate all js files in order, minify and save as one file.
+  Then we will inject that. Same for css.
+*/
+// gulp.task('inject-vendor', ['inject-angular-templates', 'copy-vendor-js', 'copy-vendor-css'], function () {
+//   // this copies index.html to dist dir and injects template.js ref to it.
+//   var injectOpts = {
+//     name: 'inject-vendor'
+//   };
+//   var srcOpts = {
+//     cwd: paths.build,
+//     read: false
+//   };
+//
+//   var srcFiles = paths.vendorJs.map(function (val) {
+//       return 'bower_components/' + path.basename(val);
+//     })
+//     .concat(
+//       paths.vendorCss.map(function (val) {
+//         return 'bower_components/' + path.basename(val);
+//       }));
+//
+//   return gulp
+//     .src(paths.build + fileNames.indexHtml)
+//     .pipe(inject(gulp.src(srcFiles, srcOpts), injectOpts))
+//     .pipe(gulp.dest(paths.build));
+// });
 
-gulp.task('build', ['htmlTemplates', 'copy-html', 'copy-css', 'copy-img', 'copy-js', 'inject-angular-templates',
-  'copy-bower-components'
+gulp.task('build', ['htmlTemplates', 'copy-html', 'copy-css', 'copy-vendor-css', 'copy-js', 'copy-vendor-js',
+  'copy-img', 'inject-angular-templates'
 ]);
 // gulp.task('build', ['copy-html', 'copy-css', 'copy-img', 'copy-js',
 //   'copy-bower-components'
