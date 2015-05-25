@@ -9,7 +9,7 @@ router.get('/', function (req, res, next) {
   'use strict';
 
   var appHtmlPath;
-  if(process.env.NODE_ENV === 'build') {
+  if(process.env.NODE_ENV === 'build' || process.env.NODE_ENV === 'pro') {
     appHtmlPath = path.join(__dirname, '../../../../dist/index.html');
   } else {
     appHtmlPath = path.join(__dirname, '../../../client/index.html');

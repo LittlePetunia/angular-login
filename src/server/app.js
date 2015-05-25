@@ -27,13 +27,38 @@ if(logLevel === 'none') {
   });
 }
 
+var connectionString;
+var dbOptions = {
+  server: {
+    socketOptions: {
+      keepAlive: 1,
+      connectTimeoutMS: 30000
+    }
+  },
+  replset: {
+    socketOptions: {
+      keepAlive: 1,
+      connectTimeoutMS: 30000
+    }
+  }
+};
+
 var dbName = 'login';
+
 if(env === 'test') {
-  // use test db
   dbName = 'login_test';
+  connectionString = 'mongodb://localhost/' + dbName;
+} else if(env === 'production') {
+  console.log('MONGO_URI ' + process.env.MONGO_URI);
+  return;
+  var mongodbUri = process.env.MONGO_URI; //'mongodb://user:pass@host:port/db';
+  connectionString = require('mongodb-uri').formatMongoose(mongodbUri);
+} else {
+  connectionString = 'mongodb://localhost/' + dbName;
 }
 
-mongoose.connect('mongodb://localhost/' + dbName);
+mongoose.connect(connectionString);
+
 var db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error: '));
@@ -75,13 +100,14 @@ app.use(cookieParser());
 // routes setup
 require('./routes/index.js')(app);
 
-// in dev environment we serve the page from /src/client
-// and resources from /bower_components
+// static dir
 if(env === 'build') {
   app.use('/', express.static('./dist'));
+} else if(env === 'pro') {
+  app.use('/', express.static('./dist'));
 } else {
-  app.use('/', express.static('./src/client'));
-  app.use('/', express.static('./'));
+  app.use('/', express.static('./src/client')); // angular
+  app.use('/', express.static('./')); // bower_components
 }
 
 // error handling

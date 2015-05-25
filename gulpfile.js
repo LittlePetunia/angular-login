@@ -28,8 +28,13 @@ var paths = {
   indexHtml: './src/client/index.html',
   js: './src/client/app/**/*.js',
   bower: './bower_components/**',
+
+  // NOTE: I added the maps because I don't like seeing the 404 error for them but I don't think it matters if they are there.
   vendorCss: ['./bower_components/bootstrap/dist/css/bootstrap.css',
-    './bower_components/bootstrap/dist/css/bootstrap-theme.css'
+    './bower_components/bootstrap/dist/css/bootstrap.css.map',
+    './bower_components/bootstrap/dist/css/bootstrap-theme.css',
+    './bower_components/bootstrap/dist/css/bootstrap-theme.css.map',
+
   ],
   vendorJs: ['./bower_components/jquery/dist/jquery.js',
     './bower_components/bootstrap/dist/js/bootstrap.js',
