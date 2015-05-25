@@ -1,5 +1,8 @@
 // server/common/utils.js
-
+/*
+  Common handlers for database request callbacks
+  
+*/
 'use strict';
 
 module.exports = {
@@ -26,17 +29,17 @@ function onError(code, res) {
     // decode ValidationError and MongoError errors.
 
     var errors;
-    if (err.errors && typeof (err.errors) === 'object' && Object.keys(err.errors).length > 0) {
-      if (typeof (err.errors) === 'object') {
+    if(err.errors && typeof (err.errors) === 'object' && Object.keys(err.errors).length > 0) {
+      if(typeof (err.errors) === 'object') {
         // console.log('errors is object');
-        if (Object.keys(err.errors).length > 0) {
+        if(Object.keys(err.errors).length > 0) {
           // console.log('errors has keys');
           errors = [];
 
           var e = err.errors;
 
-          for (var k in e) {
-            if (e.hasOwnProperty(k) && e[k].message) {
+          for(var k in e) {
+            if(e.hasOwnProperty(k) && e[k].message) {
               // console.log('errors adding message: ' + e[k].message);
 
               errors.push(e[k].message);
@@ -44,9 +47,9 @@ function onError(code, res) {
           }
 
         }
-      } else if (typeof (err.errors) === 'string') {
+      } else if(typeof (err.errors) === 'string') {
         errors = err.errors;
-      } else if (Array.isArray(err.errors)) {
+      } else if(Array.isArray(err.errors)) {
         throw new Error('unhandled error errors list type');
       }
     }

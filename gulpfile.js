@@ -6,21 +6,6 @@
 // John Papa's example in his module project
 // And while your at it have it minify to a build directory
 
-var paths = {
-  css: './src/client/app/content/*.css',
-  img: './src/client/app/content/img/*.*',
-  html: './src/client/app/**/*.html',
-  indexHtml: 'src/client/app/index.html',
-  js: './src/client/app/**/*.js',
-  fileNames: {
-    templateCache: 'template.js'
-  },
-  // server: {
-  //
-  // },
-  build: './dist/'
-};
-
 // packages
 var gulp = require('gulp'),
   gutil = require('gulp-util'),
@@ -35,64 +20,82 @@ var gulp = require('gulp'),
   angularTemplatecache = require('gulp-angular-templatecache'),
   inject = require('gulp-inject');
 
-gulp.task('css', ['clean'], function () {
-  // copy html from angular app to dist/public
-  return gulp
-    .src(paths.css)
-    .pipe(gulp.dest(paths.build + 'content/'));
+var paths = {
+  css: './src/client/content/*.css',
+  img: './src/client/content/img/*.*',
+  html: './src/client/app/**/*.html',
+  indexHtml: './src/client/index.html',
+  js: './src/client/app/**/*.js',
+  bower: './bower_components/**',
+  build: './dist/'
+};
 
-});
-gulp.task('js', ['clean'], function () {
-  // copy html from angular app to dist/public
-  return gulp
-    .src(paths.js)
-    .pipe(gulp.dest(paths.build));
-
-});
-gulp.task('img', ['clean'], function () {
-  // copy html from angular app to dist/public
-  return gulp
-    .src(paths.img)
-    .pipe(gulp.dest(paths.build + 'content/img/'));
-
-});
-
-gulp.task('inject', ['templateCache'], function () {
-  // copy html from angular app to dist/public
-
-  return gulp
-    .src(paths.indexHtml)
-    .pipe(inject(gulp.src(paths.fileNames.templateCache, {
-      cwd: paths.build
-    })))
-    // .pipe(inject(gulp.src(paths.fileNames.templateCache)))
-    .pipe(gulp.dest(paths.build));
-});
-
-gulp.task('templateCache', ['clean'], function () {
-  // log('Creating an AngularJS $templateCache');
-
-  return gulp
-    .src(['src/client/app/**/*.html', '!' + paths.indexHtml])
-    // .pipe(plug.bytediff.start())
-    // .pipe(plug.minifyHtml({
-    //     empty: true
-    // }))
-    // .pipe(plug.bytediff.stop(bytediffFormatter))
-    .pipe(angularTemplatecache(paths.fileNames.templateCache, {
-      module: 'app',
-      standalone: false,
-      root: 'app/'
-    }))
-    .pipe(gulp.dest(paths.build));
-});
+var fileNames = {
+  htmlTemplates: 'templates.js'
+};
 
 gulp.task('clean', function (cb) {
   return del(['dist'],
     cb);
 });
+gulp.task('copy-css', ['clean'], function () {
+  return gulp
+    .src(paths.css)
+    .pipe(gulp.dest(paths.build + 'content/'));
+});
+gulp.task('copy-js', ['clean', 'jshint'], function () {
+  return gulp
+    .src(paths.js)
+    .pipe(gulp.dest(paths.build + 'app/'));
 
-gulp.task('build', ['templateCache', 'css', 'img', 'js', 'inject']);
+});
+gulp.task('copy-img', ['clean'], function () {
+  return gulp
+    .src(paths.img)
+    .pipe(gulp.dest(paths.build + 'content/img/'));
+});
+
+gulp.task('copy-html', ['clean'], function () {
+  // NOTE: we don't need this html since we are already loading it in the templates.js file
+  //       but for now I will load it for debugging purpose.
+  return gulp
+    .src(['src/client/**/*.html', '!' + paths.indexHtml])
+    .pipe(gulp.dest(paths.build));
+});
+
+gulp.task('htmlTemplates', ['clean'], function () {
+  return gulp
+    .src(['src/client/app/**/*.html', '!' + paths.indexHtml])
+    .pipe(angularTemplatecache(fileNames.htmlTemplates, {
+      module: 'app',
+      standalone: false,
+      root: 'app/'
+    }))
+    .pipe(gulp.dest(paths.build + 'app/'));
+});
+gulp.task('inject-angular-templates', ['htmlTemplates'], function () {
+  // this copies index.html to dist dir and injects template.js ref to it.
+  return gulp
+    .src(paths.indexHtml)
+    .pipe(inject(gulp.src('app/' + fileNames.htmlTemplates, {
+      cwd: paths.build
+    })))
+    .pipe(gulp.dest(paths.build));
+});
+
+gulp.task('copy-bower-components', ['clean'], function () {
+  // TODO: this can be way more selective and just copy the
+  //       specific files we use instead of the entire directory of min/zip/map... files.
+  gulp.src(paths.bower)
+    .pipe(gulp.dest('dist/bower_components'));
+});
+
+gulp.task('build', ['htmlTemplates', 'copy-html', 'copy-css', 'copy-img', 'copy-js', 'inject-angular-templates',
+  'copy-bower-components'
+]);
+// gulp.task('build', ['copy-html', 'copy-css', 'copy-img', 'copy-js',
+//   'copy-bower-components'
+// ]);
 
 // jshint
 gulp.task('jshint', function () {

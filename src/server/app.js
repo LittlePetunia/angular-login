@@ -15,7 +15,7 @@ var env = process.env.NODE_ENV || 'dev';
 var logLevel = process.env.NODE_LOG_LEVEL;
 
 // configure dev logger
-if (logLevel === 'none') {
+if(logLevel === 'none') {
   require('./common/myLog.js').config({
     logFlag: false,
     logTypesAllowed: []
@@ -28,7 +28,7 @@ if (logLevel === 'none') {
 }
 
 var dbName = 'login';
-if (env === 'test') {
+if(env === 'test') {
   // use test db
   dbName = 'login_test';
 }
@@ -77,8 +77,12 @@ require('./routes/index.js')(app);
 
 // in dev environment we serve the page from /src/client
 // and resources from /bower_components
-app.use('/', express.static('./src/client'));
-app.use('/', express.static('./'));
+if(env === 'build') {
+  app.use('/', express.static('./dist'));
+} else {
+  app.use('/', express.static('./src/client'));
+  app.use('/', express.static('./'));
+}
 
 // error handling
 // catch 404 and forward to error handler

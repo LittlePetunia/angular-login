@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node ./src/server/bin/www",
     "test": "NODE_ENV=test nodemon",
+    "build": "NODE_ENV=build nodemon",
     "protractor": "protractor ./protractor.conf.js",
     "gulp": "gulp",
     "karma": "karma start",

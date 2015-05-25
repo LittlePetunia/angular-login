@@ -3,11 +3,22 @@ basic auth working.
 
 Next:
 
-  [] create dist build process
-    [] update node server so it serves correct static files based on environment: dev, test, build.
-    [] create gulp tasks to run tests on test/build environments.
-    [] can I just always build to dist in realtime and use for testing dev and pro? 
+  [] create dist build process in gulp
+    [] don't worry about minimizing for now
 
+  [] deploy on heroku
+    [] need a host for mongo db
+    [] need 'production' node configuration for specifying where to serve files
+       and where the database is located.
+
+
+  [] update node server so it serves correct static files based on environment: dev, test, build.
+  [] create gulp tasks to run tests on test/build environments.
+  [] can I just always build to dist in realtime and use for testing dev and pro?
+
+  [] use less for css generation
+    [] create gulp task to regenerate css on less file changes.
+       This needs to happen when you are testing also so add this dependency to test tasks.
 
   [x] unprotect registration page.
 
@@ -46,6 +57,8 @@ Next:
 
   [] create roles admin/user
   [] assign rights to roles {editSelf,editAll,readSelf,readAll}
+     Read up more on typical role/permission models for web apps.
+     
   [] main controller needs to watch AuthSvc.isLoggedIn so if a user logs out on one tab the change is noticed on second tab.
 
 
