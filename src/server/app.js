@@ -48,11 +48,13 @@ var dbName = 'login';
 if(env === 'test') {
   dbName = 'login_test';
   connectionString = 'mongodb://localhost/' + dbName;
-} else if(env === 'production') {
-  console.log('MONGO_URI ' + process.env.MONGO_URI);
-  return;
+} else if(env === 'pro') {
+  console.log('MONGO_URI: ' + process.env.MONGO_URI);
   var mongodbUri = process.env.MONGO_URI; //'mongodb://user:pass@host:port/db';
-  connectionString = require('mongodb-uri').formatMongoose(mongodbUri);
+  var mongoUriUtil = require('mongodb-uri');
+  connectionString = mongoUriUtil.formatMongoose(mongodbUri);
+  console.log('Mongo connection string: ' + connectionString);
+
 } else {
   connectionString = 'mongodb://localhost/' + dbName;
 }
