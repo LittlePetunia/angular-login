@@ -7,7 +7,7 @@
     "dev": "NODE_ENV=dev nodemon",
     "test": "NODE_ENV=test nodemon",
     "build": "NODE_ENV=build nodemon",
-    "pro": "NODE_ENV=pro MONGO_URI=MONGOLAB_URI node ./src/server/bin/www",
+    "pro": "NODE_ENV=pro node ./src/server/bin/www",
     "protractor": "protractor ./protractor.conf.js",
     "karma": "karma start",
     "mocha": "mocha ./src/server/test --recursive",

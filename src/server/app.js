@@ -49,8 +49,9 @@ if(env === 'test') {
   dbName = 'login_test';
   connectionString = 'mongodb://localhost/' + dbName;
 } else if(env === 'pro') {
-  console.log('MONGO_URI: ' + process.env.MONGO_URI);
-  var mongodbUri = process.env.MONGO_URI; //'mongodb://user:pass@host:port/db';
+  var mongodbUri = process.env.MONGOLAB_URI; //'mongodb://user:pass@host:port/db';
+  console.log('MONGO_URI: ' + process.env.MONGOLAB_URI);
+
   var mongoUriUtil = require('mongodb-uri');
   connectionString = mongoUriUtil.formatMongoose(mongodbUri);
   console.log('Mongo connection string: ' + connectionString);
