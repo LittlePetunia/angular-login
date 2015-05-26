@@ -11,22 +11,16 @@ function config(cfg) {
 
 function Logger(fileName) {
   this.fileName = fileName;
-
-  // console.log('Logger construction logFlag: ' + Logger.logFlag);
-  // console.log('Logger construction logTypesAllowed: ' + Logger.logTypesAllowed);
 }
 
 Logger.prototype.promise = function (functionName, promise) {
 
   var that = this;
   return promise.then(function (data) {
-      // console.log('successfully');
-
       that.success(functionName, 'success', data);
       return data;
     },
     function (err) {
-      // console.log('UN-successfully');
       that.error(functionName, 'error', err);
       throw err;
     });
@@ -41,35 +35,30 @@ Logger.prototype.info = function (functionName, msg, data) {
 };
 
 Logger.prototype.error = function (functionName, msg, err, data) {
-  if (err.name) {
+  if(err.name) {
     msg += ': ' + err.name;
   }
 
-  if (err.message) {
+  if(err.message) {
     msg += ': ' + err.message;
   }
 
-  if (err.stack) {
+  if(err.stack) {
     msg += ': ' + err.stack;
   }
   this.log('Error', this.fileName, functionName, msg, data);
 };
 
 Logger.prototype.log = function (type, fileName, functionName, msg, data) {
-
-  // console.log('starting to log');
-  if (!Logger.logFlag || Logger.logTypesAllowed.indexOf(type) === -1) {
+  if(!Logger.logFlag || Logger.logTypesAllowed.indexOf(type) === -1) {
     return;
-    // console.log('exiting to log');
-
   }
-  // console.log('continuing to log');
 
-  if (msg == null) {
+  if(msg == null) {
     msg = '';
   }
 
-  if (data != null) {
+  if(data != null) {
     data = ': ' + JSON.stringify(data);
   } else {
     data = '';

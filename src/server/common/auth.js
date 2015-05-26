@@ -14,29 +14,14 @@ var publicKey = 'mySecretKeyForNow';
 // authenticates and creates session
 function authenticate(userName, password) {
 
-  // console.log('authenticate()');
-  // if (!userName || !password) {
-  //   console.log('invalid username/password: ');
-  //   console.log(userName);
-  //   console.log(password);
-  //   log.info('authenticate', 'no match found for user/pass: ' + userName + ', ' + password);
-  // }
-
   return log.promise('authenticate',
     userDAL.getByUserNamePassword(userName, password)
     .then(function (user) {
       if(!user) {
         log.info('authenticate', 'no match found for user/pass: ' + userName + ', ' + password);
 
-        // var error = new Error();
-        // error.message = 'Invalid username or password';
-        // error.statusCode = 404; // not found
-        // error.exceptionInfo = exceptionMessages.get('username_or_password_not_found');
-
         var error = exceptionMessages.createError('username_or_password_not_found');
         error.statusCode = 404;
-
-        //error = new Error('some message');
         throw error;
       }
 

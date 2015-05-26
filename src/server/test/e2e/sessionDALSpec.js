@@ -198,7 +198,8 @@ describe('Session DAL', function () {
           .then(function (data) {
             expect(false).to.be.true;
           }, function (err) {
-            expect(err.message).to.equal('update operation requires session object to have _id value');
+            expect(err.exceptionInfo).to.exist;
+            expect(err.exceptionInfo.code).to.equal('cannot_update_object_with_null_id');
           })
           .then(function () {
             done();
@@ -213,7 +214,7 @@ describe('Session DAL', function () {
           .then(function (data) {
             expect(false).to.be.true;
           }, function (err) {
-            expect(err.message).to.equal('Session not found with id ' + newSession._id);
+            expect(err.exceptionInfo).to.exist;
           })
           .then(function () {
             done();

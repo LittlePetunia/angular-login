@@ -23,7 +23,9 @@ function onError(code, res) {
     var name = err.name || 'Unspecified Error';
     var msg;
 
+    // console.log(err);
     if(err.exceptionInfo) {
+      // console.log('has exceptionInfo')
       msg = err.exceptionInfo.message;
     } else {
       // unhandled error. We won't pass the message but we should log it.

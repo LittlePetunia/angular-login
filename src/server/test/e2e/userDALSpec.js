@@ -158,8 +158,9 @@ describe('User DAL', function () {
       .then(function (data) {
         expect('this should not be called').to.equal('');
       }, function (err) {
-        expect(err.message).to.be.equal('User not found with id ' + fakeId);
-        expect(err.statusCode).to.be.equal(404); // not found
+        expect(err.exceptionInfo).to.exist;
+        expect(err.exceptionInfo.code).to.equal('user_not_found_for_id');
+        expect(err.statusCode).to.equal(404); // not found
       })
       .then(function () {
         done();
@@ -173,8 +174,9 @@ describe('User DAL', function () {
       .then(function (data) {
         expect('this should not be called').to.equal('');
       }, function (err) {
-        expect(err.message).to.be.equal('User not found with id ' + fakeId);
-        expect(err.statusCode).to.be.equal(404); // not found
+        expect(err.exceptionInfo).to.exist;
+        expect(err.exceptionInfo.code).to.equal('user_not_found_for_id');
+        expect(err.statusCode).to.equal(404); // not found
       })
       .then(function () {
         done();
@@ -188,8 +190,9 @@ describe('User DAL', function () {
       .then(function (data) {
         expect('this should not be called').to.equal('');
       }, function (err) {
-        expect(err.message).to.be.equal('User not found with id ' + fakeId);
-        expect(err.statusCode).to.be.equal(404); // not found
+        expect(err.exceptionInfo).to.exist;
+        expect(err.exceptionInfo.code).to.equal('user_not_found_for_id');
+        expect(err.statusCode).to.equal(404); // not found
       })
       .then(function () {
         done();
@@ -202,8 +205,9 @@ describe('User DAL', function () {
       .then(function (data) {
         expect('this should not be called').to.equal('');
       }, function (err) {
-        expect(err.message).to.be.equal('update operation requires user object to have _id');
-        expect(err.statusCode).to.be.equal(422); // not found
+        expect(err.exceptionInfo).to.exist;
+        expect(err.exceptionInfo.code).to.equal('cannot_update_object_with_null_id');
+        expect(err.statusCode).to.equal(422); // not found
       })
       .then(function () {
         done();

@@ -111,6 +111,7 @@ describe('User route', function () {
   });
 
   after(function (done) {
+    console.log('closing connection');
     testUtils.closeConnection(mongoose, done);
   });
 
@@ -131,7 +132,7 @@ describe('User route', function () {
         .end(function (err, res) {
           expect(res.status).to.equal(201); //201 Created
           expect(res.header.location).to.equal(path.join(usersRootUri, res.body._id));
-          expect(res.body.userName).to.be.equal(newUser.userName);
+          expect(res.body.userName).to.equal(newUser.userName);
           expect(res.body._id).to.not.be.null;
           done();
         });
@@ -154,21 +155,20 @@ describe('User route', function () {
         .end(function (err, res) {
           expect(res.status).to.equal(201); //201 Created
           expect(res.header.location).to.equal(path.join(usersRootUri, res.body._id));
-          expect(res.body.userName).to.be.equal(newUser.userName);
+          expect(res.body.userName).to.equal(newUser.userName);
           expect(res.body._id).to.not.be.null;
           done();
         });
     });
 
-    it('should return 500 error if no user object sent', function (done) {
+    it('should return 422 error if no user object sent', function (done) {
       request(app)
         .post(urlHelper.post())
         .set('Authorization', 'Bearer ' + token)
         .send()
         .end(function (err, res) {
-          expect(res.status).to.equal(500);
-          expect(res.body.name).to.equal('ValidationError');
-          expect(res.body.message).to.equal('User validation failed');
+          expect(res.status).to.equal(422);
+          expect(res.body.message).to.have.string('Validation failed');
           done();
         });
     });
@@ -183,20 +183,15 @@ describe('User route', function () {
         lastName: 'user2'
       };
 
-      var errorMsg = 'Path `userName` (`' + newUser.userName + '`) ' +
-        'is shorter than the minimum allowed';
-
       request(app)
         .post(urlHelper.post())
         .set('Authorization', 'Bearer ' + token)
         .send(newUser)
         .end(function (err, res) {
-          expect(res.status).to.equal(500);
-          expect(res.body).to.have.all.keys('name', 'message', 'errors');
-          expect(res.body.name).to.equal('ValidationError');
-          expect(res.body.message).to.equal('User validation failed');
-          expect(res.body.errors.length).to.equal(1);
-          expect(res.body.errors[0]).to.have.string(errorMsg);
+          expect(res.status).to.equal(422);
+          expect(res.body.name).to.equal('Error');
+          expect(res.body.message).to.have.string(
+            'userName (' + newUser.userName + ') ' + 'is shorter than the minimum allowed length');
           done();
         });
     });
@@ -241,7 +236,7 @@ describe('User route', function () {
         .end(function (err, res) {
           expect(res.status).to.equal(200);
           expect(res).to.not.be.null;
-          expect(res.body._id).to.be.equal(user._id.toString());
+          expect(res.body._id).to.equal(user._id.toString());
           done();
         });
     });
@@ -253,7 +248,7 @@ describe('User route', function () {
         .end(function (err, res) {
           expect(res.status).to.equal(401);
           // expect(res).to.not.be.null;
-          // expect(res.body._id).to.be.equal(user._id.toString());
+          // expect(res.body._id).to.equal(user._id.toString());
           done();
         });
     });
@@ -265,7 +260,7 @@ describe('User route', function () {
         .end(function (err, res) {
           expect(res.status).to.equal(404);
           expect(res.body).to.not.be.null;
-          expect(res.body.message).to.be.equal('User not found with id ' + fakeUserId);
+          expect(res.body.message).to.equal('User not found');
           done();
         });
     });
@@ -280,7 +275,7 @@ describe('User route', function () {
         .end(function (err, res) {
           expect(res.status).to.equal(200);
           expect(res).to.not.be.null;
-          expect(res.body._id).to.be.equal(user._id.toString());
+          expect(res.body._id).to.equal(user._id.toString());
           done();
         });
     });
@@ -292,7 +287,7 @@ describe('User route', function () {
     //     .end(function (err, res) {
     //       expect(res.status).to.equal(404);
     //       expect(res.body).to.not.be.null;
-    //       expect(res.body.message).to.be.equal('User not found with id ' + fakeUserId);
+    //       expect(res.body.message).to.equal('User not found with id ' + fakeUserId);
     //       done();
     //     });
     // });
@@ -343,20 +338,28 @@ describe('User route', function () {
         .send(updateUser)
         .end(function (err, res) {
           expect(res.status).to.equal(200);
+          if(err) {
+            return done(err);
+          }
           request(app)
             .get(urlHelper.get(user._id))
             .set('Authorization', 'Bearer ' + token)
             .end(function (err, res) {
               expect(res.status).to.equal(200);
               expect(res.body._id.toString()).to.equal(user._id.toString());
-              expect(res.body.userName).to.be.equal(updateUser.userName);
-              expect(res.body.email).to.be.equal(updateUser.email);
-              // expect(res.body.password).to.be.equal(updateUser.password);
-              expect(res.body.firstName).to.be.equal(updateUser.firstName);
-              expect(res.body.lastName).to.be.equal(updateUser.lastName);
+              expect(res.body.userName).to.equal(updateUser.userName);
+              expect(res.body.email).to.equal(updateUser.email);
+              // expect(res.body.password).to.equal(updateUser.password);
+              expect(res.body.firstName).to.equal(updateUser.firstName);
+              expect(res.body.lastName).to.equal(updateUser.lastName);
+
+              if(err) {
+                return done(err);
+              }
               done();
             });
-        });
+        })
+
     });
 
     it('should return 422 error if user object id differs from url user id', function (done) {
@@ -366,7 +369,7 @@ describe('User route', function () {
         .send(user)
         .end(function (err, res) {
           expect(res.status).to.equal(422); //422 Unprocessable Entity
-          expect(res.body.message).to.have.string('id of object does not match id in path.'); //422 Unprocessable Entity
+          expect(res.body.message).to.equal('Error occurred'); //422 Unprocessable Entity
           done();
         });
     });

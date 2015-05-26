@@ -34,6 +34,7 @@ addInfo(3002, type, 'email_not_available', 'Email is associated with an existing
 addInfo(3002, type, 'email_and_username_not_available', 'Email and user-name are associated with an existing account');
 addInfo(3003, type, 'user_not_found_for_id', 'User not found', 'Invalid user id');
 addInfo(3004, type, 'object_not_found_by_id', 'Object not found', 'Invalid item id');
+addInfo(3005, type, 'validation_failure', 'Validation failed');
 
 exceptionInfo.createError = function (code, userInfo, debugInfo) {
   var item = getInfo(code);

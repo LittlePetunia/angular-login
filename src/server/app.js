@@ -14,20 +14,6 @@ var port = process.env.PORT || 3000;
 var env = process.env.NODE_ENV || 'dev';
 var logLevel = process.env.NODE_LOG_LEVEL;
 
-// so we can serialize errors
-Object.defineProperty(Error.prototype, 'toJSON', {
-  value: function () {
-    var alt = {};
-
-    Object.getOwnPropertyNames(this).forEach(function (key) {
-      alt[key] = this[key];
-    }, this);
-
-    return alt;
-  },
-  configurable: true
-});
-
 // configure dev logger
 if(logLevel === 'none') {
   require('./common/myLog.js').config({
@@ -57,6 +43,7 @@ var dbOptions = {
   }
 };
 
+// TODO: create module for mongoose setup
 var dbName = 'login';
 
 if(env === 'test') {
@@ -85,28 +72,23 @@ db.once('open', function () {
 
 var app = express();
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/../client/content/img/favicon.ico'));
 app.use(logger('dev'));
 
-// We are going to protect /api routes with JWT (not sure if this needs to be first or is better after logger)
+// protect /api routes with JWT (not sure if this needs to be first or is better after logger)
 var publicKey = 'mySecretKeyForNow';
+// TODO: use public key for secret
 // var publicKey = fs.readFileSync('/pat/to/public.pub');
-app.set('jwtTokenSecret', publicKey); // so we can use this in other places
-app.use('/api', expressJwt({
-  secret: publicKey,
 
-  //requestProperty: 'auth'
-  // ,
-  // getToken:function(req){
-  //   if(req.headers.authorization &&  req.headers.authorization.split(' ')[0] === 'Bearer'){
-  //     return req.headers.authorization.split(' ')[1];
-  //   }
-  // }
-}).unless({
-  method: 'POST',
-  path: '/api/users'
-}));
+// so we can use this in other places
+app.set('jwtTokenSecret', publicKey);
+
+app.use('/api', expressJwt({
+    secret: publicKey
+  })
+  .unless({
+    method: 'POST',
+    path: '/api/users'
+  }));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({

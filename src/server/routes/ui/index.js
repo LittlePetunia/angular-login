@@ -14,7 +14,6 @@ router.get('/', function (req, res, next) {
   } else {
     appHtmlPath = path.join(__dirname, '../../../client/index.html');
   }
-  // var appHtmlPath = path.join(__dirname, '../../../../dist/index.html');
   res.sendFile(appHtmlPath);
 
 });

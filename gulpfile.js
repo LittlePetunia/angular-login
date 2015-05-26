@@ -194,6 +194,12 @@ gulp.task('protractor', function () {
 gulp.task('mocha', function () {
   return gulp
     .src(['src/server/test/e2e/*.*Spec.js'])
+    .pipe(mocha());
+});
+
+gulp.task('mocha-report', function () {
+  return gulp
+    .src(['src/server/test/e2e/*.*Spec.js'])
     .pipe(mocha({
       istanbul: true
     }));
@@ -216,7 +222,7 @@ gulp.task('karma-watch', function () {
 
 // TODO: need to make sure the node server is running before karma
 gulp.task('test', function (cb) {
-  runSequence('protractor', 'karma', 'mocha', cb);
+  runSequence('protractor', 'karma', 'mocha-report', cb);
 });
 
 gulp.task('browser-sync', function () {

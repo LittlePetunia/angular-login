@@ -7,6 +7,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var User = require('../../data-access/user.js');
 var routeUtils = require('../routeUtils.js');
+var exceptionMessages = require('../../common/exceptionMessages.js');
 
 var path = require('path');
 
@@ -65,22 +66,26 @@ router.put('/users/:userId', function (req, res, next) {
   var userId = req.params.userId;
   var user = req.body;
 
+  // console.log('put called');
+
   if(user._id == null) {
     user._id = userId;
   } else if(user._id.toString() !== userId.toString()) {
 
     var debugInfo = 'object _id: ' + user._id + ' path id: ' + userId;
     var error = exceptionMessages.createError('path_id_differs_from_object_id', null, debugInfo);
-    routeUtils.onError(422, res)(error);
-    // return res.status(422) //422 Unprocessable Entity
-    //   .json({
-    //     message: 'id of object does not match id in path.' + ' object _id: ' + user._id + ' path id: ' + userId
-    //   });
+    // var fn = routeUtils.onError(422, res);
+    // return fn(error);
+
+    return routeUtils.onError(422, res)(error);
   }
 
+  // console.log('updating a user');
   User.update(user)
     .then(routeUtils.onSuccess(200, res),
       routeUtils.onError(500, res));
+  return;
+
 });
 
 module.exports = router;
