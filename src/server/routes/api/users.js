@@ -68,10 +68,14 @@ router.put('/users/:userId', function (req, res, next) {
   if(user._id == null) {
     user._id = userId;
   } else if(user._id.toString() !== userId.toString()) {
-    return res.status(422) //422 Unprocessable Entity
-      .json({
-        message: 'id of object does not match id in path.' + ' object _id: ' + user._id + ' path id: ' + userId
-      });
+
+    var debugInfo = 'object _id: ' + user._id + ' path id: ' + userId;
+    var error = exceptionMessages.createError('path_id_differs_from_object_id', null, debugInfo);
+    routeUtils.onError(422, res)(error);
+    // return res.status(422) //422 Unprocessable Entity
+    //   .json({
+    //     message: 'id of object does not match id in path.' + ' object _id: ' + user._id + ' path id: ' + userId
+    //   });
   }
 
   User.update(user)

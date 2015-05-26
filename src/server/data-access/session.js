@@ -5,6 +5,8 @@ var _ = require('underscore');
 var log = require('../common/myLog.js').create('/server/data-access/session');
 var SessionModel = require('../db-models/session.js');
 
+var exceptionMessages = require('../common/exceptionMessages.js');
+
 function get(id) {
   return log.promise('get',
     SessionModel.findById(id).exec());
@@ -28,8 +30,11 @@ function update(session) {
   // console.log('update() session._id ' + session._id);
   if(!session._id) {
     var promise = new mongoose.Promise();
-    var error = new Error();
-    error.message = 'update operation requires session object to have _id value';
+    // var error = new Error();
+    // error.message = 'update operation requires session object to have _id value';
+    // error.statusCode = 422; //422 Unprocessable Entity
+    //
+    var error = exceptionMessages.createError('cannot_update_object_with_null_id', 'Session update', 'Session update');
     error.statusCode = 422; //422 Unprocessable Entity
     promise.reject(error);
     return promise;
@@ -39,9 +44,13 @@ function update(session) {
     get(session._id)
     .then(function (data) {
       if(!data) {
-        var error = new Error();
-        error.message = 'Session not found with id ' + session._id;
+        // var error = new Error();
+        // error.message = 'Session not found with id ' + session._id;
+        // error.statusCode = 404; // not found
+
+        var error = exceptionMessages.createError('object_not_found_by_id', 'Session', 'Session Id: ' + session._id);
         error.statusCode = 404; // not found
+
         throw error;
       } else {
         data.createdDateTime = session.createdDateTime;

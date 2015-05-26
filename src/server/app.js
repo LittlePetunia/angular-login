@@ -14,6 +14,20 @@ var port = process.env.PORT || 3000;
 var env = process.env.NODE_ENV || 'dev';
 var logLevel = process.env.NODE_LOG_LEVEL;
 
+// so we can serialize errors
+Object.defineProperty(Error.prototype, 'toJSON', {
+  value: function () {
+    var alt = {};
+
+    Object.getOwnPropertyNames(this).forEach(function (key) {
+      alt[key] = this[key];
+    }, this);
+
+    return alt;
+  },
+  configurable: true
+});
+
 // configure dev logger
 if(logLevel === 'none') {
   require('./common/myLog.js').config({

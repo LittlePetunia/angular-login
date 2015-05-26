@@ -42,7 +42,7 @@
             type: 'error',
             mode: 'single'
           });
-          console.log(res);
+          // console.log(res);
         });
     }
   }

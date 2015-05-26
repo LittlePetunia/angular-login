@@ -6,6 +6,7 @@ var utils = require('./utils.js');
 var log = require('./myLog.js').create('/server/common/auth');
 var jwt = require('jsonwebtoken');
 var Q = require('q');
+var exceptionMessages = require('./exceptionMessages.js');
 
 var publicKey = 'mySecretKeyForNow';
 // var publicKey = fs.readFileSync('/pat/to/public.pub');
@@ -27,9 +28,15 @@ function authenticate(userName, password) {
       if(!user) {
         log.info('authenticate', 'no match found for user/pass: ' + userName + ', ' + password);
 
-        var error = new Error();
-        error.message = 'Invalid username or password';
-        error.statusCode = 404; // not found
+        // var error = new Error();
+        // error.message = 'Invalid username or password';
+        // error.statusCode = 404; // not found
+        // error.exceptionInfo = exceptionMessages.get('username_or_password_not_found');
+
+        var error = exceptionMessages.createError('username_or_password_not_found');
+        error.statusCode = 404;
+
+        //error = new Error('some message');
         throw error;
       }
 

@@ -69,7 +69,7 @@
   function errorInterceptor($q) {
     return {
       responseError: function (res) {
-        console.log(res);
+        // console.log(res);
         if(res.status === 0 && res.data == null) {
           res.data = {};
           res.data.message = 'The site is not available right now.';
