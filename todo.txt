@@ -3,17 +3,46 @@ basic auth working.
 
 Next:
 
-  [] better error messages
-    [] return error id, msg for expected errors which we show message for
+  [x] OAuth with google plus
+      - prototype is working!!!
+
+    todo:
+      [x] create passport local strategy so code is consistent
+      [] refactor code so config module is used.
+      [] consider making modules for node areas: users:routes, model, controller.
+          Not sure about this. I guess if you imagine a ton of routes, models, controllers
+          yeah, you will want separate dirs for each.
+
+      [] move the database config to config/mongo module
+
+      [] refactor so routes/models are in same dir. So it looks like this:
+        api
+          user
+            user.model
+            user.data-access (later we will get rid of this and add these functions to the model)
+            user.routes
+            user.index (sets up routes)
+        auth
+          google
+            routes
+            passport
+          local
+            routes
+            passport
+          index
+          service
+
+      [] move DAL code to mongoose model
+
+
+
+
+
+
+  [x] better error messages
+    [x] return error id, msg for expected errors which we show message for
        other errors we give generic error message.
-    [] create dictionary of error info by id on server.
-        On start fetch the list and put it somewhere accessible to all probably an exceptionMsgSvc
-        Call this service to generate the specific/general error message for display.
 
-  [] OAuth with google plus
-
-
-  
 
   [] create gulp tasks to run tests on test/build environments.
   [] can I just always build to dist in realtime and use for testing dev and pro?

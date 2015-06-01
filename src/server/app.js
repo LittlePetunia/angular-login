@@ -102,6 +102,7 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 require('./auth/google/passport').setup();
+require('./auth/local/passport').setup();
 
 // routes setup
 require('./routes/index.js')(app, passport);
@@ -128,10 +129,6 @@ app.use(function (req, res, next) {
 app.use(function (err, req, res, next) {
 
   console.log('error handler route called');
-  // res.status(err.status || 500);
-  // res.json({
-  //   msg: err
-  // });
 
   var code = err.statusCode || 500;
   var name = err.name || 'Unspecified Error';

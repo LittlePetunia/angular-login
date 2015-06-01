@@ -8,9 +8,6 @@ var config = require('../../config/environment');
 module.exports.setup = function () {
 
   passport.use(new GoogleStrategy({
-      // clientID: config.google.clientID,
-      // clientSecret: config.google.clientSecret,
-      // callbackURL: config.google.callbackURL
 
       clientID: config.secrets.google.clientID,
       clientSecret: config.secrets.google.clientSecret,

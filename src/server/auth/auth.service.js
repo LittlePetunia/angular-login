@@ -81,17 +81,17 @@ function signToken(id) {
  * Set token cookie directly for oAuth strategies
  */
 function setTokenCookie(req, res) {
+
   if(!req.user) {
     return res.status(404).json({
       message: 'Error occurred'
     });
   }
+  console.log('setting cookie');
 
   var token = signToken(req.user._id);
   res.cookie('token', token);
-  // why do we redirect?
   res.redirect('/');
-  // res.send();
 }
 
 exports.isAuthenticated = isAuthenticated;
