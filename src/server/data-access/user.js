@@ -23,16 +23,7 @@ function getById(userId) {
       _id: userId
     })
     //.select(userFields)
-    .exec()
-    .then(function (dbUser) {
-
-      // if(!dbUser) {
-      //   var error = exceptionMessages.createError('user_not_found_for_id', null, 'id: ' + userId);
-      //   error.statusCode = 404;
-      //   throw error;
-      // }
-      return dbUser;
-    }));
+    .exec());
 }
 
 function getByUserNamePassword(userName, password) {
@@ -73,7 +64,7 @@ function deleteById(userId) {
 }
 
 function saveUser(user) {
-  return log.promise('userSave',
+  return log.promise('saveUser',
     user.save()
   ).then(function (data) {
       // console.log('userSave succeeded');

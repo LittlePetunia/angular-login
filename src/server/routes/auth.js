@@ -5,9 +5,9 @@
 var express = require('express');
 var router = express.Router();
 // var authDAL = require('../common/auth.js');
-var userDAL = require('../data-access/user.js');
-var routeUtils = require('./routeUtils.js');
-var log = require('../common/myLog.js').create('/server/routes/auth');
+// var userDAL = require('../data-access/user.js');
+// var routeUtils = require('./routeUtils.js');
+// var log = require('../common/myLog.js').create('/server/routes/auth');
 var auth = require('../auth/auth.service');
 var exceptionMessages = require('../common/exceptionMessages');
 

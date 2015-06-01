@@ -14,33 +14,32 @@ if(!mongoose.models.User) {
       type: String,
       trim: true
     },
+
     password: {
       type: String
     },
+
     email: {
       type: String,
       lowercase: true,
       trim: true
         // match: /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i
     },
+
     firstName: {
       type: String,
       trim: true
-        // required: '{PATH} is required',
-        // minlength: 1,
-        // maxlength: 100
     },
+
     lastName: {
       type: String,
       trim: true
-        // required: '{PATH} is required',
-        // minlength: 1,
-        // maxlength: 100
     },
 
     provider: {
       type: String
     },
+
     google: {},
 
     createdDateTime: {
@@ -58,12 +57,13 @@ if(!mongoose.models.User) {
     virtuals: true
   });
 
-  // virtuals
-  UserSchema
-    .virtual('displayUserName')
-    .get(function () {
-      return this.userName || this.google.name;
-    });
+  // // virtuals
+  // we don't get a username from google (so far...)
+  // UserSchema
+  //   .virtual('displayUserName')
+  //   .get(function () {
+  //     return this.userName || this.google.name;
+  //   });
 
   // virtuals
   UserSchema
@@ -88,18 +88,20 @@ if(!mongoose.models.User) {
   validateUnique('userName');
 
   mongoose.model('User', UserSchema);
-
 }
 
 function validateUnique(path, pathDesc) {
   UserSchema
     .path(path)
     .validate(function (value, respond) {
+      console.log('validating unique ' + path + ': ' + value);
       if(value) {
+
+        var whereClause = {};
+        whereClause[path] = value;
+
         var self = this;
-        this.constructor.findOne({
-          path: value
-        }, function (err, data) {
+        this.constructor.findOne(whereClause, function (err, data) {
           if(err) {
             throw err;
           }

@@ -8,13 +8,15 @@ Next:
 
     todo:
       [x] create passport local strategy so code is consistent
-      [] refactor code so config module is used.
-      [] consider making modules for node areas: users:routes, model, controller.
+      [x] refactor code so config module is used.
+
+
+      [x] move the database config to config/mongo module
+
+      [-] consider making modules for node areas: users:routes, model, controller.
           Not sure about this. I guess if you imagine a ton of routes, models, controllers
           yeah, you will want separate dirs for each.
-
-      [] move the database config to config/mongo module
-
+          
       [] refactor so routes/models are in same dir. So it looks like this:
         api
           user
@@ -35,7 +37,8 @@ Next:
       [] move DAL code to mongoose model
 
 
-
+  [] setup logging to file system
+      - will this work on Heroku?
 
 
 
