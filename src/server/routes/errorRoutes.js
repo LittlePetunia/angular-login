@@ -1,5 +1,4 @@
 'use strict';
-// var config = require('../config/environment');
 
 module.exports.notFoundHandler = function (req, res, next) {
 
@@ -10,8 +9,6 @@ module.exports.notFoundHandler = function (req, res, next) {
 };
 
 module.exports.errorHandler = function (err, req, res, next) {
-
-  // error handler
 
   console.log('error handler route called');
 

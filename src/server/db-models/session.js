@@ -25,7 +25,7 @@ var ObjectId = mongoose.Schema.Types.ObjectId;
 //     });
 // });
 
-if (!mongoose.models.Session) {
+if(!mongoose.models.Session) {
 
   var sessionSchema = new mongoose.Schema({
 

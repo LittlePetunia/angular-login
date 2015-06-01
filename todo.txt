@@ -16,7 +16,7 @@ Next:
       [-] consider making modules for node areas: users:routes, model, controller.
           Not sure about this. I guess if you imagine a ton of routes, models, controllers
           yeah, you will want separate dirs for each.
-          
+
       [] refactor so routes/models are in same dir. So it looks like this:
         api
           user

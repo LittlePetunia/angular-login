@@ -122,8 +122,10 @@ function update(user) {
   return log.promise('update',
     getById(user._id)
     .then(function (dbUser) {
-      // is there a better way to copy without copying any _id and  __v property?
-      mongooseUtils.copyFieldsToModel(user, dbUser);
+      // only these fields should be updated
+      ['userName', 'email', 'firstName', 'lastName'].forEach(function (val) {
+        dbUser[val] = user[val];
+      });
       return saveUser(dbUser);
     })
   );

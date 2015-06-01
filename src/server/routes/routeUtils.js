@@ -1,4 +1,3 @@
-// server/common/utils.js
 /*
   Common handlers for database request callbacks
 

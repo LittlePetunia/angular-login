@@ -1,19 +1,11 @@
-// routes.api.users.js
 /*jslint node: true */
 'use strict';
 
-var express = require('express');
-var router = express.Router();
-// var authDAL = require('../common/auth.js');
-// var userDAL = require('../data-access/user.js');
-// var routeUtils = require('./routeUtils.js');
-// var log = require('../common/myLog.js').create('/server/routes/auth');
+var router = require('express').Router();
 var auth = require('../auth/auth.service');
 var exceptionMessages = require('../common/exceptionMessages');
 
-var passport = require('passport');
-
-module.exports = function () {
+module.exports = function (passport) {
 
   router.post('/auth/local', passport.authenticate('local', {
     failureRedirect: '/register',

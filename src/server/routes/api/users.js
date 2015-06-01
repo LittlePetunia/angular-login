@@ -41,8 +41,6 @@ router.get('/users/:userId', function (req, res, next) {
 // POST
 router.post('/users', function (req, res, next) {
 
-  console.log('posted to /users');
-
   User.create(req.body) // 201: created
     .then(function (data) {
         res
