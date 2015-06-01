@@ -14,7 +14,10 @@
     activate();
 
     function activate() {
-      if (AuthSvc.isLoggedIn()) {
+
+      var t = AuthSvc.getToken();
+
+      if(AuthSvc.isLoggedIn()) {
         AuthSvc.getCurrentUser()
           .then(function (user) {
               vm.user = user;

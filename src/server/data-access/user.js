@@ -9,7 +9,7 @@ var UserModel = require('../db-models/user.js');
 var log = require('../common/myLog.js').create('/server/db-access/user');
 var exceptionMessages = require('../common/exceptionMessages.js');
 
-var userFields = 'userId userName email firstName lastName';
+var userFields = 'userId userName email firstName lastName fullName';
 
 function get(condition) {
   return UserModel
@@ -22,14 +22,15 @@ function getById(userId) {
     UserModel.findOne({
       _id: userId
     })
-    .select(userFields)
+    //.select(userFields)
     .exec()
     .then(function (dbUser) {
-      if(!dbUser) {
-        var error = exceptionMessages.createError('user_not_found_for_id', null, 'id: ' + userId);
-        error.statusCode = 404;
-        throw error;
-      }
+
+      // if(!dbUser) {
+      //   var error = exceptionMessages.createError('user_not_found_for_id', null, 'id: ' + userId);
+      //   error.statusCode = 404;
+      //   throw error;
+      // }
       return dbUser;
     }));
 }
@@ -41,7 +42,7 @@ function getByUserNamePassword(userName, password) {
       userName: userName,
       password: password
     })
-    .select(userFields)
+    //.select(userFields)
     .exec());
 
 }

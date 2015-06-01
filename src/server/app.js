@@ -7,8 +7,11 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-var expressJwt = require('express-jwt');
-var jwt = require('jsonwebtoken');
+// var expressJwt = require('express-jwt');
+// var jwt = require('jsonwebtoken');
+var passport = require('passport');
+
+var config = require('./config/environment');
 
 var port = process.env.PORT || 3000;
 var env = process.env.NODE_ENV || 'dev';
@@ -75,20 +78,20 @@ var app = express();
 app.use(logger('dev'));
 
 // protect /api routes with JWT (not sure if this needs to be first or is better after logger)
-var publicKey = 'mySecretKeyForNow';
+// var publicKey = 'mySecretKeyForNow';
 // TODO: use public key for secret
 // var publicKey = fs.readFileSync('/pat/to/public.pub');
 
 // so we can use this in other places
-app.set('jwtTokenSecret', publicKey);
-
-app.use('/api', expressJwt({
-    secret: publicKey
-  })
-  .unless({
-    method: 'POST',
-    path: '/api/users'
-  }));
+// app.set('jwtTokenSecret', publicKey);
+//
+// app.use('/api', expressJwt({
+//     secret: config.secrets.tokenSecret
+//   })
+//   .unless({
+//     method: 'POST',
+//     path: '/api/users'
+//   }));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -96,8 +99,12 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser());
 
+app.use(passport.initialize());
+
+require('./auth/google/passport').setup();
+
 // routes setup
-require('./routes/index.js')(app);
+require('./routes/index.js')(app, passport);
 
 // static dir
 if(env === 'build') {
@@ -119,10 +126,31 @@ app.use(function (req, res, next) {
 
 // error handlers
 app.use(function (err, req, res, next) {
-  res.status(err.status || 500);
-  res.json({
-    msg: err
-  });
+
+  console.log('error handler route called');
+  // res.status(err.status || 500);
+  // res.json({
+  //   msg: err
+  // });
+
+  var code = err.statusCode || 500;
+  var name = err.name || 'Unspecified Error';
+  var msg;
+
+  if(err.exceptionInfo) {
+    msg = err.exceptionInfo.message;
+  } else {
+    // unhandled error. We won't pass the message but we should log it.
+    msg = 'Error occurred';
+    // TODO: implement logging system for saving to file and add errors from here
+    console.error(err);
+  }
+
+  return res.status(code)
+    .json({
+      name: name,
+      message: msg
+    });
 });
 
 console.log('About to crank up node');

@@ -44,13 +44,12 @@
         // http://stackoverflow.com/questions/20647483/angularjs-injecting-service-into-a-http-interceptor-circular-dependency
 
         var AuthSvc = $injector.get('AuthSvc');
-        if(AuthSvc.isLoggedIn()) {
-          // console.log('requesting with token');
-          config.headers.Authorization = 'Bearer ' + AuthSvc.getToken();
+        var token = AuthSvc.getToken();
+        if(token) {
+          config.headers.Authorization = 'Bearer ' + token;
+        } else {
+          console.log('no token in request');
         }
-        //  else {
-        //   // console.log('requesting without token');
-        // }
         return config;
       },
       response: function (response) {

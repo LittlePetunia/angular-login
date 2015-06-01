@@ -9,36 +9,48 @@
    * service for
    * holding session info
    */
-  AuthSvc.$inject = ['$cookies', '$q', '$http'];
+  AuthSvc.$inject = ['$cookies', '$q', '$http', '$timeout'];
 
-  function AuthSvc($cookies, $q, $http) {
+  function AuthSvc($cookies, $q, $http, $timeout) {
 
     var userUrl = '/api/users';
-    var loginUrl = '/authenticate';
+    var loginUrl = '/auth/local';
 
     var currentUser;
 
-    var cookieToken = {
-      set: function (token, durationMS) {
-
-        durationMS = durationMS || (1000 * 60 * 30);
-        var d = new Date();
-        d.setMilliseconds(d.getMilliseconds() + durationMS);
-
-        $cookies.put('token', token, {
-          expires: d
-        });
-      },
-      get: function () {
-        return $cookies.get('token');
-      },
-      clear: function () {
-        $cookies.remove('token');
-      },
-    };
+    // var cookieToken = {
+    //   set: function (token, durationMS) {
+    //
+    //     durationMS = durationMS || (1000 * 60 * 30);
+    //     var d = new Date();
+    //     d.setMilliseconds(d.getMilliseconds() + durationMS);
+    //
+    //     $cookies.put('token', token, {
+    //       expires: d
+    //     });
+    //   },
+    //   get: function () {
+    //     var token = $cookies.get('token');
+    //     if(token) {
+    //       console.log('token found');
+    //     } else {
+    //       console.log('token not found');
+    //     }
+    //     return token;
+    //   },
+    //   clear: function () {
+    //     $cookies.remove('token');
+    //   },
+    // };
 
     function getToken() {
-      return cookieToken.get();
+      var t = $cookies.get('token');
+      return t;
+    }
+
+    function clearToken() {
+      var t = $cookies.remove('token');
+      return t;
     }
 
     function login(userName, password) {
@@ -46,23 +58,18 @@
           userName: userName,
           password: password
         })
-        .then(function (res) {
-            cookieToken.set(res.data.token);
-          },
-          function (res) {
+        .catch(function (res) {
+          clearUserAndToken();
+          throw res;
+        });
+    }
 
-            // NOTE: if you supply an error handler then you must either
-            // throw an exception or return a rejected promise if you
-            // want the error condition to persist. Otherwise the caller
-            // will get the return value (if any) in their success handler.
-            // and their error handler will not be called.
-            clearUserAndToken();
-            throw res; // this works!! :)
-          });
+    function loginProvider(provider) {
+      return $http.get('/auth/' + provider);
     }
 
     function clearUserAndToken() {
-      cookieToken.clear();
+      clearToken();
       currentUser = null;
     }
 
@@ -71,17 +78,18 @@
     }
 
     function isLoggedIn() {
-      return cookieToken.get() != null;
+      var t = getToken();
+      return t != null;
     }
 
     function getCurrentUser() {
 
       // var deferred = $q.defer();
 
-      if (!isLoggedIn()) {
+      if(!isLoggedIn()) {
         return $q.reject(new Error('User not logged in'));
 
-      } else if (currentUser) {
+      } else if(currentUser) {
         return $q.when(currentUser);
 
       } else {
@@ -102,6 +110,7 @@
 
     return {
       login: login,
+      loginProvider: loginProvider,
       logout: logout,
       isLoggedIn: isLoggedIn,
       getCurrentUser: getCurrentUser,

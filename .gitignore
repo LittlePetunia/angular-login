@@ -22,6 +22,8 @@ build/Release
 node_modules
 /bower_components
 
+#secret info
+secrets.js
 
 # Third Party
 .DS_Store

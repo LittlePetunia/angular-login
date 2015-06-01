@@ -4,9 +4,9 @@
   angular.module('app')
     .controller('LoginCtrl', LoginCtrl);
 
-  LoginCtrl.$inject = ['$rootScope', '$state', 'AuthSvc', 'GlobalNotificationSvc'];
+  LoginCtrl.$inject = ['$rootScope', '$state', 'AuthSvc', 'GlobalNotificationSvc', '$timeout', '$window'];
 
-  function LoginCtrl($rootScope, $state, AuthSvc, GlobalNotificationSvc) {
+  function LoginCtrl($rootScope, $state, AuthSvc, GlobalNotificationSvc, $timeout, $window) {
 
     var vm = this;
     // properties
@@ -17,6 +17,7 @@
 
     // functions
     vm.login = login;
+    vm.loginProvider = loginProvider;
 
     activate();
 
@@ -28,23 +29,30 @@
 
     function login(user) {
       AuthSvc.login(user.userName, user.password)
-        .then(function () {
-          $state.go('welcome');
-          GlobalNotificationSvc.add({
-            message: 'Login Successful',
-            type: 'success',
-            nextState: true,
-            timeout: 2000
-          });
-        }, function (res) {
-          GlobalNotificationSvc.add({
-            message: res.data.message,
-            type: 'error',
-            mode: 'single'
-          });
-          // console.log(res);
-        });
+        .then(redirectAfterLogin, loginFailureNotify);
     }
-  }
 
+    function loginProvider(provider) {
+      $window.location.href = '/auth/' + provider;
+    }
+
+    function loginFailureNotify(res) {
+      GlobalNotificationSvc.add({
+        message: res.data.message,
+        type: 'error',
+        mode: 'single'
+      });
+    }
+
+    function redirectAfterLogin() {
+      $state.go('welcome');
+      GlobalNotificationSvc.add({
+        message: 'Login Successful',
+        type: 'success',
+        nextState: true,
+        timeout: 2000
+      });
+    }
+
+  }
 }(this.angular));

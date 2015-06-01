@@ -8,7 +8,7 @@ var mongoose = require('mongoose');
 var User = require('../../data-access/user.js');
 var routeUtils = require('../routeUtils.js');
 var exceptionMessages = require('../../common/exceptionMessages.js');
-
+var auth = require('../../auth/auth.service');
 var path = require('path');
 
 // GET All
@@ -20,9 +20,10 @@ router.get('/users', function (req, res, next) {
 });
 
 // GET me
-router.get('/users/me', function (req, res, next) {
+router.get('/users/me', auth.isAuthenticated(), function (req, res, next) {
 
   // express-jwt decodes token and sets it to request.user
+  console.log('getting user: ' + req.user._id);
   User.getById(req.user._id)
     .then(routeUtils.onSuccess(200, res),
       routeUtils.onError(500, res));
