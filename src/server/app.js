@@ -6,7 +6,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
+// var mongoose = require('mongoose');
 // var expressJwt = require('express-jwt');
 // var jwt = require('jsonwebtoken');
 var passport = require('passport');
@@ -30,48 +30,51 @@ if(logLevel === 'none') {
   });
 }
 
-var connectionString;
-var dbOptions = {
-  server: {
-    socketOptions: {
-      keepAlive: 1,
-      connectTimeoutMS: 30000
-    }
-  },
-  replset: {
-    socketOptions: {
-      keepAlive: 1,
-      connectTimeoutMS: 30000
-    }
-  }
-};
+require('./config/mongoose').connect();
 
-// TODO: create module for mongoose setup
-var dbName = 'login';
+// var connectionString;
+// var dbOptions = {
+//   server: {
+//     socketOptions: {
+//       keepAlive: 1,
+//       connectTimeoutMS: 30000
+//     }
+//   },
+//   replset: {
+//     socketOptions: {
+//       keepAlive: 1,
+//       connectTimeoutMS: 30000
+//     }
+//   }
+// };
 
-if(env === 'test') {
-  dbName = 'login_test';
-  connectionString = 'mongodb://localhost/' + dbName;
-} else if(env === 'pro') {
-  var mongodbUri = process.env.MONGOLAB_URI; //'mongodb://user:pass@host:port/db';
-  console.log('MONGO_URI: ' + process.env.MONGOLAB_URI);
-
-  var mongoUriUtil = require('mongodb-uri');
-  connectionString = mongoUriUtil.formatMongoose(mongodbUri);
-  console.log('Mongo connection string: ' + connectionString);
-
-} else {
-  connectionString = 'mongodb://localhost/' + dbName;
-}
-
-mongoose.connect(connectionString);
-
-var db = mongoose.connection;
-
-db.on('error', console.error.bind(console, 'connection error: '));
-db.once('open', function () {
-  console.log('Connected to MongoDB');
-});
+//
+// // TODO: create module for mongoose setup
+// var dbName = 'login';
+//
+// if(env === 'test') {
+//   dbName = 'login_test';
+//   connectionString = 'mongodb://localhost/' + dbName;
+// } else if(env === 'pro') {
+//   var mongodbUri = process.env.MONGOLAB_URI; //'mongodb://user:pass@host:port/db';
+//   console.log('MONGO_URI: ' + process.env.MONGOLAB_URI);
+//
+//   var mongoUriUtil = require('mongodb-uri');
+//   connectionString = mongoUriUtil.formatMongoose(mongodbUri);
+//   console.log('Mongo connection string: ' + connectionString);
+//
+// } else {
+//   connectionString = 'mongodb://localhost/' + dbName;
+// }
+//
+// mongoose.connect(connectionString);
+//
+// var db = mongoose.connection;
+//
+// db.on('error', console.error.bind(console, 'connection error: '));
+// db.once('open', function () {
+//   console.log('Connected to MongoDB');
+// });
 
 var app = express();
 
@@ -150,10 +153,10 @@ app.use(function (err, req, res, next) {
     });
 });
 
-console.log('About to crank up node');
-console.log('PORT: ' + port);
-console.log('NODE_ENV: ' + env);
-console.log('DB: ' + dbName);
+console.log('About to start node');
+console.log('NODE_ENV: ' + config.env);
+console.log('PORT: ' + config.port);
+console.log('DB: ' + config.mongoose.dbName);
 console.log('NODE_LOG_LEVEL: ' + logLevel);
 
 module.exports = app;
