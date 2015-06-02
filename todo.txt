@@ -3,6 +3,9 @@ basic auth working.
 
 Next:
 
+  [] try moving DAL code to mongoose model. See what it looks like. Not sure I am a fan of this.
+
+
   [x] OAuth with google plus
       - prototype is working!!!
 
@@ -13,28 +16,6 @@ Next:
 
       [x] move the database config to config/mongo module
 
-      [-] consider making modules for node areas: users:routes, model, controller.
-          Not sure about this. I guess if you imagine a ton of routes, models, controllers
-          yeah, you will want separate dirs for each.
-
-      [] refactor so routes/models are in same dir. So it looks like this:
-        api
-          user
-            user.model
-            user.data-access (later we will get rid of this and add these functions to the model)
-            user.routes
-            user.index (sets up routes)
-        auth
-          google
-            routes
-            passport
-          local
-            routes
-            passport
-          index
-          service
-
-      [] move DAL code to mongoose model
 
 
   [] setup logging to file system
