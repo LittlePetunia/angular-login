@@ -12,7 +12,7 @@ var auth = require('../../auth/auth.service');
 var path = require('path');
 
 // GET All
-router.get('/users', function (req, res, next) {
+router.get('/users', auth.isAuthenticated(), function (req, res, next) {
 
   User.get({})
     .then(routeUtils.onSuccess(200, res),
@@ -29,17 +29,41 @@ router.get('/users/me', auth.isAuthenticated(), function (req, res, next) {
       routeUtils.onError(500, res));
 });
 // Get One
-router.get('/users/:userId', function (req, res, next) {
+router.get('/users/:userId', auth.isAuthenticated(), function (req, res, next) {
 
   var userId = req.params.userId;
-
   User.getById(userId)
-    .then(routeUtils.onSuccess(200, res),
-      routeUtils.onError(500, res));
+    .then(function (data) {
+      if(!data) {
+        var error = exceptionMessages.createError('user_not_found_for_id');
+        error.statusCode = 404;
+        throw error;
+      }
+
+      return res.status(200).json(data);
+    })
+    .then(null, next);
+
 });
 
 // POST
 router.post('/users', function (req, res, next) {
+
+  // if(!req.body.userName) {
+  //   var error = exceptionMessages.createError('validation_failure', 'UserName is required');
+  //   error.statusCode = 422; //unporcessable entity
+  //   return next(error);
+  // }
+  // if(!req.body.password) {
+  //   var error = exceptionMessages.createError('validation_failure', 'UserName is required');
+  //   error.statusCode = 422; //unporcessable entity
+  //   return next(error);
+  // }
+  // if(!req.body.email) {
+  //   var error = exceptionMessages.createError('validation_failure', 'UserName is required');
+  //   error.statusCode = 422; //unporcessable entity
+  //   return next(error);
+  // }
 
   User.create(req.body) // 201: created
     .then(function (data) {
@@ -52,7 +76,7 @@ router.post('/users', function (req, res, next) {
 });
 
 // DELETE
-router.delete('/users/:userId', function (req, res, next) {
+router.delete('/users/:userId', auth.isAuthenticated(), function (req, res, next) {
 
   var userId = req.params.userId;
 
@@ -62,23 +86,22 @@ router.delete('/users/:userId', function (req, res, next) {
 });
 
 // PUT
-router.put('/users/:userId', function (req, res, next) {
+router.put('/users/:userId', auth.isAuthenticated(), function (req, res, next) {
 
   var userId = req.params.userId;
   var user = req.body;
 
   // console.log('put called');
 
+  console.log('user: ' + user);
   if(user._id == null) {
     user._id = userId;
   } else if(user._id.toString() !== userId.toString()) {
 
     var debugInfo = 'object _id: ' + user._id + ' path id: ' + userId;
     var error = exceptionMessages.createError('path_id_differs_from_object_id', null, debugInfo);
-    // var fn = routeUtils.onError(422, res);
-    // return fn(error);
-
-    return routeUtils.onError(422, res)(error);
+    error.statusCode = 422;
+    return next(error);
   }
 
   // console.log('updating a user');

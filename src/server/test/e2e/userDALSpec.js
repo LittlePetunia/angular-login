@@ -124,8 +124,10 @@ describe('User DAL', function () {
       })
       .then(function (data) {
         expect(data).to.not.be.null;
+        // does not update password. we will have specific function for that
+        expect(data.password).to.equal(user.password);
+
         expect(data.userName).to.equal(updateUser.userName);
-        expect(data.password).to.equal(updateUser.password);
         expect(data.email).to.equal(updateUser.email.toLowerCase());
         expect(data.firstName).to.equal(updateUser.firstName);
         expect(data.lastName).to.equal(updateUser.lastName);

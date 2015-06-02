@@ -14,7 +14,7 @@ var fakeUserId = '5536a74e354d000000000000';
 
 var urlHelper = {
   login: function () {
-    return 'localhost:3000/authenticate';
+    return 'localhost:3000/auth/local';
   },
   get: function (userId) {
     if(userId) {
@@ -46,7 +46,8 @@ function create(user) {
     .send(user)
     .end(function (err, res) {
       if(err) {
-        deferred.reject(new Error(err));
+        console.log('error creating user');
+        deferred.reject(err);
       } else {
         deferred.resolve(res);
       }
@@ -54,32 +55,89 @@ function create(user) {
   return deferred.promise;
 }
 
+// function login(user) {
+//   var deferred = Q.defer();
+//   request
+//     .post(urlHelper.login())
+//     .send({
+//       userName: user.userName,
+//       password: user.password
+//     })
+//     .end(function (err, res) {
+//       if(err) {
+//         console.log('error logging in');
+//         // if(err.response.error) {
+//         //   console.log(err.response.error);
+//         // } else {
+//         console.log(err);
+//         // }
+//         deferred.reject(err);
+//       } else {
+//         deferred.resolve(res);
+//       }
+//     });
+//   return deferred.promise;
+// }
+
 function login(user) {
   var deferred = Q.defer();
+
   request
     .post(urlHelper.login())
     .send({
       userName: user.userName,
       password: user.password
     })
-    .end(function (err, res) {
-      if(err) {
-        deferred.reject(new Error(err));
+    .on('redirect', function (res) {
+      var t = getTokenFromResponseHeader(res);
+      if(t) {
+        // console.log('resolving login token: ' + t);
+        deferred.resolve(t);
       } else {
-        deferred.resolve(res);
+        console.log('rejecting login token: ' + t);
+        deferred.reject(new Error('no token in res'));
       }
-    });
+    })
+    .end();
+  // .end(function (err, res) {
+  //   console.log('done with login');
+  // });
+  // .end(function (err, res) {
+  //   // I always get a CONNECTONREFUSED error from this
+  //   // even though the 'redirect' response is good above
+  //   // This does not seem consistent with online examples of
+  //   // handling redirects. They seem to not have this error
+  //   // and get a res object with res.redirects array in this block.
+  //   // return deferred.promise;
+  // });
   return deferred.promise;
 }
 
+function getTokenFromResponseHeader(res) {
+
+  var t = res.headers['set-cookie'];
+
+  if(t && t.length > 0) {
+    var tokenString = t[0].split(' ')[0];
+    var match = tokenString.match(/token=([^;]+);/);
+    if(match.length > 1) {
+      return match[1];
+    }
+  }
+
+  return null;
+}
+
 function getUsers(userId, token) {
+  // console.log('getting users with token: ' + token);
   var deferred = Q.defer();
   request
     .get(urlHelper.get(userId))
     .set('Authorization', 'Bearer ' + token)
     .end(function (err, res) {
       if(err) {
-        deferred.reject(new Error(err));
+        console.log('error getting user by id');
+        deferred.reject(err);
       } else {
         deferred.resolve(res);
       }
@@ -96,13 +154,22 @@ function deleteUser(userId, token) {
       if(err) {
         console.log('error deleting user: ' + userId);
         console.log(err);
-        deferred.reject(new Error(err));
+        deferred.reject(err);
       } else {
         //console.log('deleted user: ' + userId);
         deferred.resolve(res);
       }
     });
   return deferred.promise;
+}
+
+// helper to log nasty superagent response if error occurred.
+function logError(err) {
+  if(err.response && err.response.res && err.response.res.body) {
+    console.log(err.response.res.body);
+  } else {
+    console.log(err);
+  }
 }
 
 describe('Registration form', function () {
@@ -121,33 +188,33 @@ describe('Registration form', function () {
   tokenUser.firstName = 'test';
   tokenUser.lastName = 'user';
 
-  // create user so i can get token for him.
-  // then delete all users
+  // create user so I can have a token
   beforeAll(function (done) {
     create(tokenUser)
       .then(function (res) {
         return login(tokenUser);
       })
-      .then(function (res) {
-        token = res.body.token;
-      })
-      .then(function (res) {
+      .then(function (data) {
+        token = data;
         done();
       }, function (err) {
-        console.log(err);
+        logError(err);
         done(err);
       });
   });
 
-  // create user so i can get token for him.
-  // then delete all users
+  // delete all users except token user
   beforeEach(function (done) {
     getUsers(null, token)
       .then(function (res) {
         if(res.body.length > 0) {
-          var promises = res.body.map(function (item) {
-            return deleteUser(item._id, token);
-          });
+          var promises = res.body
+            .filter(function (item) {
+              return item.userName !== tokenUser.userName;
+            })
+            .map(function (item) {
+              return deleteUser(item._id, token);
+            });
 
           return Q.all(promises);
         } else {
@@ -159,7 +226,7 @@ describe('Registration form', function () {
       .then(function (res) {
         done();
       }, function (err) {
-        console.log(err);
+        logError(err);
         done(err);
       });
   });
@@ -282,6 +349,8 @@ describe('Registration form', function () {
       page.firstName = 'test';
       page.lastName = 'user';
 
+      var displayName = 'test user';
+
       page.btnSubmit.click();
 
       browser.wait(function () {
@@ -290,8 +359,7 @@ describe('Registration form', function () {
           });
         }, 2000)
         .then(function () {
-          expect(element(by.linkText('testUser22')).isPresent()).toEqual(true);
-          // browser.pause();
+          expect(element(by.linkText(displayName)).isPresent()).toEqual(true);
           // expect($$('a[sref="logout"]').count()).toEqual(1);
           expect(element(by.linkText('Logout')).isPresent()).toEqual(true);
         });

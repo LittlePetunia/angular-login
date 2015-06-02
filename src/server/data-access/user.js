@@ -4,7 +4,6 @@ var mongoose = require('mongoose');
 var uniqueValidator = require('mongoose-unique-validator');
 var _ = require('underscore');
 
-var mongooseUtils = require('../common/mongooseUtils.js');
 var UserModel = require('../db-models/user.js');
 var log = require('../common/myLog.js').create('/server/db-access/user');
 var exceptionMessages = require('../common/exceptionMessages.js');
@@ -67,43 +66,38 @@ function saveUser(user) {
   return log.promise('saveUser',
     user.save()
   ).then(function (data) {
-      // console.log('userSave succeeded');
+      // console.log('saveUser succeeded');
       return data;
     },
+
     function (err) {
-      if(err.message === 'User validation failed') {
+      // console.log('saveUser: error saving userrrrrrrr');
+      // console.log(err);
 
-        var emailUnique = err.errors.email && err.errors.email.message.search('must be unique') !== -1;
-        var userNameUnique = err.errors.userName && err.errors.userName.message.search('must be unique') !== -1;
+      if(!err.exceptionInfo && err.message === 'User validation failed') {
+        // console.log('saveUser: creating custom error');
 
-        // console.log(err);
         var customError;
-        if(emailUnique && userNameUnique) {
-          customError = exceptionMessages.createError('email_and_username_not_available');
-          customError.statusCode = 422; //422 Unprocessable Entity
-        } else if(emailUnique) {
-          customError = exceptionMessages.createError('email_not_available');
-          customError.statusCode = 422; //422 Unprocessable Entity
-        } else if(userNameUnique) {
-          customError = exceptionMessages.createError('username_not_available');
-          customError.statusCode = 422; //422 Unprocessable Entity
-        } else {
 
-          var errMsg = Object.keys(err.errors).map(function (key) {
-            return err.errors[key].message.replace(/Path /g, '').replace(/`/g, '');
-          }).join('. ');
+        var errMsg = Object.keys(err.errors).map(function (key) {
+          return err.errors[key].message.replace(/Path /g, '').replace(/`/g, '');
+        }).join('. ');
+        // console.log('errMsg');
+        // console.log(errMsg);
 
-          // console.log(errMsg);
-          customError = exceptionMessages.createError('validation_failure', errMsg);
-          customError.statusCode = 422; //422 Unprocessable Entity
-        }
+        // console.log(errMsg);
+        customError = exceptionMessages.createError('validation_failure', errMsg);
+        customError.statusCode = 422; //422 Unprocessable Entity
+        // }
 
         // console.log('throwing custom error');
         // console.log(customError);
+        // console.log('Throwing custome error');
         throw customError;
       } else {
+        // console.log('unhandled error ');
         // not a validation error!
-        return err;
+        throw err;
       }
     }
   );
@@ -122,6 +116,11 @@ function update(user) {
   return log.promise('update',
     getById(user._id)
     .then(function (dbUser) {
+      if(!dbUser) {
+        var error = exceptionMessages.createError('user_not_found_for_id', null, 'id: ' + user._id);
+        error.statusCode = 404;
+        throw error;
+      }
       // only these fields should be updated
       ['userName', 'email', 'firstName', 'lastName'].forEach(function (val) {
         dbUser[val] = user[val];

@@ -1,5 +1,6 @@
 'use strict';
 
+var exceptionMessages = require('../common/exceptionMessages.js');
 var mongoose = require('mongoose');
 
 // var uniqueValidator = require('mongoose-unique-validator');
@@ -12,11 +13,15 @@ if(!mongoose.models.User) {
   var UserSchema = new mongoose.Schema({
     userName: {
       type: String,
-      trim: true
+      trim: true,
+      minlength: 8,
+      maxlength: 100
     },
 
     password: {
-      type: String
+      type: String,
+      minlength: 8,
+      maxlength: 100
     },
 
     email: {
@@ -28,7 +33,7 @@ if(!mongoose.models.User) {
 
     firstName: {
       type: String,
-      trim: true
+      trim: true,
     },
 
     lastName: {
@@ -87,6 +92,36 @@ if(!mongoose.models.User) {
   validateUnique('email');
   validateUnique('userName');
 
+  UserSchema
+    .pre('save', function (next) {
+      // user must have username/password/email if not from a provider
+
+      //console.log('pre-validating user');
+      if(!this.provider) {
+        var error;
+        if(!this.userName) {
+          error = exceptionMessages.createError('validation_failure', 'UserName is required');
+        }
+        if(!this.password) {
+          error = exceptionMessages.createError('validation_failure', 'Password is required');
+        }
+        if(!this.email) {
+          error = exceptionMessages.createError('validation_failure', 'Email is required');
+        }
+
+        if(error) {
+          error.statusCode = 422; //unporcessable entity
+          //console.log('exiting pre-validate with error found');
+          return next(error);
+        }
+      }
+
+      //console.log('exiting pre-validate with no error found');
+
+      next();
+
+    });
+
   mongoose.model('User', UserSchema);
 }
 
@@ -94,7 +129,7 @@ function validateUnique(path, pathDesc) {
   UserSchema
     .path(path)
     .validate(function (value, respond) {
-      console.log('validating unique ' + path + ': ' + value);
+      //console.log('validating unique ' + path + ': ' + value);
       if(value) {
 
         var whereClause = {};

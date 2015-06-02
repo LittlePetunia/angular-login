@@ -20,7 +20,7 @@ function isAuthenticated() {
   return compose()
     // Validate jwt
     .use(function (req, res, next) {
-      console.log('running isAuthenticated');
+      //console.log('running isAuthenticated');
 
       // allow access_token to be passed through query parameter as well
       if(req.query && req.query.hasOwnProperty('access_token')) {
@@ -28,13 +28,13 @@ function isAuthenticated() {
         req.headers.authorization = 'Bearer ' + req.query.access_token;
       }
 
-      console.log('isAuthenticated request Authorization');
-      console.log(req.headers.authorization);
+      //console.log('isAuthenticated request Authorization');
+      //console.log(req.headers.authorization);
       validateJwt(req, res, next);
     })
     // Attach user to request
     .use(function (req, res, next) {
-      console.log('running isAuthenticated.getById');
+      //console.log('running isAuthenticated.getById');
 
       userDAL.getById(req.user._id)
         .then(function (user) {
@@ -87,10 +87,13 @@ function setTokenCookie(req, res) {
       message: 'Error occurred'
     });
   }
-  console.log('setting cookie');
+  //console.log('setting cookie');
 
   var token = signToken(req.user._id);
   res.cookie('token', token);
+  // res.status(200).json({
+  //   token: token
+  // });
   res.redirect('/');
 }
 

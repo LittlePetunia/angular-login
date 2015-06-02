@@ -18,13 +18,16 @@ function onSuccess(code, res) {
 function onError(code, res) {
   return function (err) {
 
+    //console.log('onError handler');
+    //console.log(err);
+
     code = err.statusCode || code || 500;
     var name = err.name || 'Unspecified Error';
     var msg;
 
-    // console.log(err);
+    // //console.log(err);
     if(err.exceptionInfo) {
-      // console.log('has exceptionInfo')
+      // //console.log('has exceptionInfo')
       msg = err.exceptionInfo.message;
     } else {
       // unhandled error. We won't pass the message but we should log it.

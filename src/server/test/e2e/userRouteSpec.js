@@ -6,7 +6,6 @@
 
 process.env.NODE_ENV = 'test';
 process.env.NODE_LOG_LEVEL = 'none';
-// process.env.NODE_LOG_LEVEL = '';
 
 var mongoose = require('mongoose');
 var request = require('supertest');
@@ -16,7 +15,7 @@ var path = require('path');
 
 var testUtils = require('../../common/testUtils.js');
 var userDAL = require('../../data-access/user.js');
-var authDAL = require('../../common/auth.js');
+var auth = require('../../auth/auth.service.js');
 
 var app = require('../../app.js');
 
@@ -29,7 +28,7 @@ var fakeUserId = '5536a74e354d000000000000';
 
 var urlHelper = {
   login: function (user) {
-    return '/authenticate';
+    return '/auth/local';
   },
   getMe: function () {
     return path.join(usersRootUri, 'me');
@@ -50,15 +49,6 @@ var urlHelper = {
     return path.join(usersRootUri, userId.toString());
   }
 };
-
-// function tokenDecrypt(token){
-//   var req = {};
-//   req.headers = {};
-//     req.headers.authorization = 'Bearer ' + token;
-//     expressjwt({secret: app.get()})(req, res, function() {
-//       assert.equal('foo', req.user);
-//     });
-// }
 
 describe('User route', function () {
 
@@ -88,11 +78,16 @@ describe('User route', function () {
     };
 
     userDAL.create(user)
-      .then(function () {
-        return authDAL.authenticate(user.userName, user.password);
+      .then(function (user) {
+        return auth.signToken(user._id);
+      }, function (err) {
+
+        console.log('before each user save error');
+        throw err;
       })
       .then(function (data) {
         token = data;
+
         // console.log('data: ' + data);
         // console.log('token: ' + token);
       })
@@ -129,8 +124,8 @@ describe('User route', function () {
       request(app)
         .post(urlHelper.post())
         .send(newUser)
+        .expect(201)
         .end(function (err, res) {
-          expect(res.status).to.equal(201); //201 Created
           expect(res.header.location).to.equal(path.join(usersRootUri, res.body._id));
           expect(res.body.userName).to.equal(newUser.userName);
           expect(res.body._id).to.not.be.null;
@@ -152,8 +147,8 @@ describe('User route', function () {
         .post(urlHelper.post())
         .set('Authorization', 'Bearer ' + token)
         .send(newUser)
+        .expect(201)
         .end(function (err, res) {
-          expect(res.status).to.equal(201); //201 Created
           expect(res.header.location).to.equal(path.join(usersRootUri, res.body._id));
           expect(res.body.userName).to.equal(newUser.userName);
           expect(res.body._id).to.not.be.null;
@@ -166,8 +161,9 @@ describe('User route', function () {
         .post(urlHelper.post())
         .set('Authorization', 'Bearer ' + token)
         .send()
+        .expect(422)
         .end(function (err, res) {
-          expect(res.status).to.equal(422);
+          console.log(err);
           expect(res.body.message).to.have.string('Validation failed');
           done();
         });
@@ -187,9 +183,8 @@ describe('User route', function () {
         .post(urlHelper.post())
         .set('Authorization', 'Bearer ' + token)
         .send(newUser)
+        .expect(422)
         .end(function (err, res) {
-          expect(res.status).to.equal(422);
-          expect(res.body.name).to.equal('Error');
           expect(res.body.message).to.have.string(
             'userName (' + newUser.userName + ') ' + 'is shorter than the minimum allowed length');
           done();
@@ -214,13 +209,14 @@ describe('User route', function () {
         .set('Authorization', 'Bearer ' + token)
         //.set('Authorization', token)
         .send(newUser)
+        .expect(201)
         .end(function (err, res) {
-          expect(res.status).to.equal(201); //201 Created
           request(app)
             .get(urlHelper.get())
             .set('Authorization', 'Bearer ' + token)
+            .send()
+            .expect(200)
             .end(function (err, res) {
-              expect(res.status).to.equal(200);
               expect(res.body.length).to.equal(2);
               done();
             });
@@ -233,8 +229,9 @@ describe('User route', function () {
       request(app)
         .get(urlHelper.get(user._id))
         .set('Authorization', 'Bearer ' + token)
+        .send()
+        .expect(200)
         .end(function (err, res) {
-          expect(res.status).to.equal(200);
           expect(res).to.not.be.null;
           expect(res.body._id).to.equal(user._id.toString());
           done();
@@ -244,11 +241,9 @@ describe('User route', function () {
     it('should return 401 error if no token supplied', function (done) {
       request(app)
         .get(urlHelper.get(user._id))
-        // .set('Authorization', 'Bearer ' + token)
+        .send()
+        .expect(401)
         .end(function (err, res) {
-          expect(res.status).to.equal(401);
-          // expect(res).to.not.be.null;
-          // expect(res.body._id).to.equal(user._id.toString());
           done();
         });
     });
@@ -257,9 +252,9 @@ describe('User route', function () {
       request(app)
         .get(urlHelper.get(fakeUserId))
         .set('Authorization', 'Bearer ' + token)
+        .send()
+        .expect(404)
         .end(function (err, res) {
-          expect(res.status).to.equal(404);
-          expect(res.body).to.not.be.null;
           expect(res.body.message).to.equal('User not found');
           done();
         });
@@ -272,25 +267,27 @@ describe('User route', function () {
       request(app)
         .get(urlHelper.getMe())
         .set('Authorization', 'Bearer ' + token)
+        .send()
+        .expect(200)
         .end(function (err, res) {
-          expect(res.status).to.equal(200);
           expect(res).to.not.be.null;
           expect(res.body._id).to.equal(user._id.toString());
           done();
         });
     });
 
-    // it('should return 404 if user not found', function (done) {
-    //   request(app)
-    //     .get(urlHelper.get(fakeUserId))
-    //     .set('Authorization', 'Bearer ' + token)
-    //     .end(function (err, res) {
-    //       expect(res.status).to.equal(404);
-    //       expect(res.body).to.not.be.null;
-    //       expect(res.body.message).to.equal('User not found with id ' + fakeUserId);
-    //       done();
-    //     });
-    // });
+    it('should return 404 if user not found', function (done) {
+      request(app)
+        .get(urlHelper.get(fakeUserId))
+        .set('Authorization', 'Bearer ' + token)
+        .send()
+        .expect(204)
+        .end(function (err, res) {
+          expect(res.body).to.not.be.null;
+          expect(res.body.message).to.equal('User not found');
+          done();
+        });
+    });
   });
 
   describe('DELETE /users/:userId', function () {
@@ -298,13 +295,15 @@ describe('User route', function () {
       request(app)
         .delete(urlHelper.delete(user._id))
         .set('Authorization', 'Bearer ' + token)
+        .send()
+        .expect(204)
         .end(function (err, res) {
-          expect(res.status).to.equal(204); //204 No Content
           request(app)
             .get(urlHelper.get(user._id))
             .set('Authorization', 'Bearer ' + token)
+            .send()
+            .expect(404)
             .end(function (err, res) {
-              expect(res.status).to.equal(404);
               done();
             });
         });
@@ -314,6 +313,8 @@ describe('User route', function () {
       request(app)
         .delete(urlHelper.delete(fakeUserId))
         .set('Authorization', 'Bearer ' + token)
+        .send()
+        .expect(404)
         .end(function (err, res) {
           expect(res.status).to.equal(404); //404 not found
           done();
@@ -336,20 +337,20 @@ describe('User route', function () {
         .put(urlHelper.put(user._id))
         .set('Authorization', 'Bearer ' + token)
         .send(updateUser)
+        .expect(200)
         .end(function (err, res) {
-          expect(res.status).to.equal(200);
           if(err) {
             return done(err);
           }
           request(app)
             .get(urlHelper.get(user._id))
             .set('Authorization', 'Bearer ' + token)
+            .send()
+            .expect(200)
             .end(function (err, res) {
-              expect(res.status).to.equal(200);
               expect(res.body._id.toString()).to.equal(user._id.toString());
               expect(res.body.userName).to.equal(updateUser.userName);
               expect(res.body.email).to.equal(updateUser.email);
-              // expect(res.body.password).to.equal(updateUser.password);
               expect(res.body.firstName).to.equal(updateUser.firstName);
               expect(res.body.lastName).to.equal(updateUser.lastName);
 
@@ -358,7 +359,7 @@ describe('User route', function () {
               }
               done();
             });
-        })
+        });
 
     });
 
@@ -367,8 +368,8 @@ describe('User route', function () {
         .put(urlHelper.put(fakeUserId))
         .set('Authorization', 'Bearer ' + token)
         .send(user)
+        .expect(422)
         .end(function (err, res) {
-          expect(res.status).to.equal(422); //422 Unprocessable Entity
           expect(res.body.message).to.equal('Error occurred'); //422 Unprocessable Entity
           done();
         });
@@ -380,8 +381,8 @@ describe('User route', function () {
         .put(urlHelper.put(fakeUserId))
         .set('Authorization', 'Bearer ' + token)
         .send(user)
+        .expect(404)
         .end(function (err, res) {
-          expect(res.status).to.equal(404); //422 Unprocessable Entity
           done();
         });
     });
