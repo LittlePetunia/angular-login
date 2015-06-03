@@ -3,7 +3,8 @@ basic auth working.
 
 Next:
 
-  [] try moving DAL code to mongoose model. See what it looks like. Not sure I am a fan of this.
+  [!!!] try moving DAL code to mongoose model. See what it looks like. Not sure I am a fan of this.
+        I changed my mind. I will keep schema definition in one file and DAL in another.
 
 
   [x] OAuth with google plus

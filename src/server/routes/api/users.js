@@ -23,7 +23,7 @@ router.get('/users', auth.isAuthenticated(), function (req, res, next) {
 router.get('/users/me', auth.isAuthenticated(), function (req, res, next) {
 
   // express-jwt decodes token and sets it to request.user
-  console.log('getting user: ' + req.user._id);
+  // console.log('getting user: ' + req.user._id);
   User.getById(req.user._id)
     .then(routeUtils.onSuccess(200, res),
       routeUtils.onError(500, res));
@@ -49,21 +49,7 @@ router.get('/users/:userId', auth.isAuthenticated(), function (req, res, next) {
 // POST
 router.post('/users', function (req, res, next) {
 
-  // if(!req.body.userName) {
-  //   var error = exceptionMessages.createError('validation_failure', 'UserName is required');
-  //   error.statusCode = 422; //unporcessable entity
-  //   return next(error);
-  // }
-  // if(!req.body.password) {
-  //   var error = exceptionMessages.createError('validation_failure', 'UserName is required');
-  //   error.statusCode = 422; //unporcessable entity
-  //   return next(error);
-  // }
-  // if(!req.body.email) {
-  //   var error = exceptionMessages.createError('validation_failure', 'UserName is required');
-  //   error.statusCode = 422; //unporcessable entity
-  //   return next(error);
-  // }
+  // console.log('/users post: creating user');
 
   User.create(req.body) // 201: created
     .then(function (data) {
@@ -93,7 +79,7 @@ router.put('/users/:userId', auth.isAuthenticated(), function (req, res, next) {
 
   // console.log('put called');
 
-  console.log('user: ' + user);
+  // console.log('user: ' + user);
   if(user._id == null) {
     user._id = userId;
   } else if(user._id.toString() !== userId.toString()) {

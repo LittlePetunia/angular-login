@@ -2,7 +2,7 @@
 
 var exceptionMessages = require('../common/exceptionMessages.js');
 var mongoose = require('mongoose');
-
+var crypto = require('crypto');
 // var uniqueValidator = require('mongoose-unique-validator');
 // var _ = require('underscore');
 
@@ -18,11 +18,9 @@ if(!mongoose.models.User) {
       maxlength: 100
     },
 
-    password: {
-      type: String,
-      minlength: 8,
-      maxlength: 100
-    },
+    hashedPassword: String,
+
+    salt: String,
 
     email: {
       type: String,
@@ -42,7 +40,9 @@ if(!mongoose.models.User) {
     },
 
     provider: {
-      type: String
+      type: String,
+      required: true,
+      default: 'local'
     },
 
     google: {},
@@ -69,6 +69,16 @@ if(!mongoose.models.User) {
   //   .get(function () {
   //     return this.userName || this.google.name;
   //   });
+
+  UserSchema
+    .virtual('password')
+    .set(function (password) {
+      this.salt = this.makeSalt();
+      this.hashedPassword = this.encryptPassword(password);
+    });
+  // .get(function () {
+  //   return this._password;
+  // });
 
   // virtuals
   UserSchema
@@ -97,12 +107,12 @@ if(!mongoose.models.User) {
       // user must have username/password/email if not from a provider
 
       //console.log('pre-validating user');
-      if(!this.provider) {
+      if(this.provider === 'local') {
         var error;
         if(!this.userName) {
           error = exceptionMessages.createError('validation_failure', 'UserName is required');
         }
-        if(!this.password) {
+        if(!this.hashedPassword) {
           error = exceptionMessages.createError('validation_failure', 'Password is required');
         }
         if(!this.email) {
@@ -148,6 +158,33 @@ function validateUnique(path, pathDesc) {
         });
       }
     }, 'The ' + (pathDesc || path) + ' is already in use');
+
+  UserSchema.methods = {
+
+    authenticate: function (plainText) {
+
+      // console.log('input password: ' + plainText);
+      // console.log('input password encrypted: ' + this.encryptPassword(plainText));
+      // console.log('user password' + this.hashedPassword);
+
+      return this.encryptPassword(plainText) === this.hashedPassword;
+    },
+
+    makeSalt: function () {
+      return crypto.randomBytes(16).toString('base64');
+    },
+
+    encryptPassword: function (password) {
+      // console.log('ready to encrypt password: ' + password + ' with salt ' + this.salt);
+
+      if(!password || !this.salt) {
+        return '';
+      }
+      var salt = new Buffer(this.salt, 'base64');
+      return crypto.pbkdf2Sync(password, salt, 10000, 64).toString('base64');
+    }
+  };
+
 }
 
 module.exports = mongoose.model('User');

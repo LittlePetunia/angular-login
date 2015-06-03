@@ -25,24 +25,31 @@ function getById(userId) {
     .exec());
 }
 
-function getByUserNamePassword(userName, password) {
-
-  return log.promise('getByUserNamePassword',
-    UserModel.findOne({
-      userName: userName,
-      password: password
-    })
-    //.select(userFields)
-    .exec());
-
-}
+// function authenticate(userName, password) {
+//   return User.findOne({
+//       userName: userName
+//     }).exec()
+//     .then(function (user) {
+//       if(!user || !user.authenticate(password)) {
+//         var error = exceptionMessages.createError('username_or_password_not_found');
+//         error.statusCode = 404;
+//         throw error;
+//       }
+//       return user;
+//     });
+// }
 
 function create(user) {
 
   var copy = _.clone(user);
   delete copy._id;
+  console.log('input user: ');
+  console.log(user);
 
   var newUser = new UserModel(copy);
+
+  console.log('creating user: ' + newUser);
+
   return saveUser(newUser);
 }
 
@@ -134,7 +141,7 @@ module.exports = {
   Model: UserModel,
   get: get,
   getById: getById,
-  getByUserNamePassword: getByUserNamePassword,
+  // getByUserNamePassword: getByUserNamePassword,
   create: create,
   deleteById: deleteById,
   update: update
