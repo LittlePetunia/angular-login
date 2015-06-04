@@ -1,3 +1,3 @@
 # angular-login
-Angular app with login/registration and authentication with JSON Web Token.
-Next step is to add oauth functionality for logging in with google and facebook accounts.
+Angular app with login/registration and local authentication with JSON Web Token or
+authentication with Google using oauth 2.0.
