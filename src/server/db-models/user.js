@@ -62,23 +62,12 @@ if(!mongoose.models.User) {
     virtuals: true
   });
 
-  // // virtuals
-  // we don't get a username from google (so far...)
-  // UserSchema
-  //   .virtual('displayUserName')
-  //   .get(function () {
-  //     return this.userName || this.google.name;
-  //   });
-
   UserSchema
     .virtual('password')
     .set(function (password) {
       this.salt = this.makeSalt();
       this.hashedPassword = this.encryptPassword(password);
     });
-  // .get(function () {
-  //   return this._password;
-  // });
 
   // virtuals
   UserSchema
@@ -104,10 +93,10 @@ if(!mongoose.models.User) {
 
   UserSchema
     .pre('save', function (next) {
-      // user must have username/password/email if not from a provider
 
-      //console.log('pre-validating user');
       if(this.provider === 'local') {
+        // user must have username/password/email local provider
+
         var error;
         if(!this.userName) {
           error = exceptionMessages.createError('validation_failure', 'UserName is required');
@@ -121,12 +110,9 @@ if(!mongoose.models.User) {
 
         if(error) {
           error.statusCode = 422; //unporcessable entity
-          //console.log('exiting pre-validate with error found');
           return next(error);
         }
       }
-
-      //console.log('exiting pre-validate with no error found');
 
       next();
 
@@ -136,10 +122,6 @@ if(!mongoose.models.User) {
 
     authenticate: function (plainText) {
 
-      // console.log('input password: ' + plainText);
-      // console.log('input password encrypted: ' + this.encryptPassword(plainText));
-      // console.log('user password' + this.hashedPassword);
-
       return this.encryptPassword(plainText) === this.hashedPassword;
     },
 
@@ -148,8 +130,6 @@ if(!mongoose.models.User) {
     },
 
     encryptPassword: function (password) {
-      // console.log('ready to encrypt password: ' + password + ' with salt ' + this.salt);
-
       if(!password || !this.salt) {
         return '';
       }
@@ -166,7 +146,6 @@ function validateUnique(path, pathDesc) {
   UserSchema
     .path(path)
     .validate(function (value, respond) {
-      //console.log('validating unique ' + path + ': ' + value);
       if(value) {
 
         var whereClause = {};
