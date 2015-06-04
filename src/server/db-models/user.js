@@ -132,33 +132,6 @@ if(!mongoose.models.User) {
 
     });
 
-  mongoose.model('User', UserSchema);
-}
-
-function validateUnique(path, pathDesc) {
-  UserSchema
-    .path(path)
-    .validate(function (value, respond) {
-      //console.log('validating unique ' + path + ': ' + value);
-      if(value) {
-
-        var whereClause = {};
-        whereClause[path] = value;
-
-        var self = this;
-        this.constructor.findOne(whereClause, function (err, data) {
-          if(err) {
-            throw err;
-          }
-
-          if(data && data.id !== self.id) {
-            respond(false);
-          }
-          respond(true);
-        });
-      }
-    }, 'The ' + (pathDesc || path) + ' is already in use');
-
   UserSchema.methods = {
 
     authenticate: function (plainText) {
@@ -185,6 +158,33 @@ function validateUnique(path, pathDesc) {
     }
   };
 
+  mongoose.model('User', UserSchema);
+}
+
+// helper
+function validateUnique(path, pathDesc) {
+  UserSchema
+    .path(path)
+    .validate(function (value, respond) {
+      //console.log('validating unique ' + path + ': ' + value);
+      if(value) {
+
+        var whereClause = {};
+        whereClause[path] = value;
+
+        var self = this;
+        this.constructor.findOne(whereClause, function (err, data) {
+          if(err) {
+            throw err;
+          }
+
+          if(data && data.id !== self.id) {
+            respond(false);
+          }
+          respond(true);
+        });
+      }
+    }, 'The ' + (pathDesc || path) + ' is already in use');
 }
 
 module.exports = mongoose.model('User');

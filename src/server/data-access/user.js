@@ -18,37 +18,17 @@ function get(condition) {
 
 function getById(userId) {
   return log.promise('getById',
-    UserModel.findOne({
-      _id: userId
-    })
-    //.select(userFields)
+    UserModel.findById(userId)
+    .select(userFields)
     .exec());
 }
-
-// function authenticate(userName, password) {
-//   return User.findOne({
-//       userName: userName
-//     }).exec()
-//     .then(function (user) {
-//       if(!user || !user.authenticate(password)) {
-//         var error = exceptionMessages.createError('username_or_password_not_found');
-//         error.statusCode = 404;
-//         throw error;
-//       }
-//       return user;
-//     });
-// }
 
 function create(user) {
 
   var copy = _.clone(user);
   delete copy._id;
-  console.log('input user: ');
-  console.log(user);
 
   var newUser = new UserModel(copy);
-
-  console.log('creating user: ' + newUser);
 
   return saveUser(newUser);
 }
@@ -73,36 +53,21 @@ function saveUser(user) {
   return log.promise('saveUser',
     user.save()
   ).then(function (data) {
-      // console.log('saveUser succeeded');
       return data;
     },
 
     function (err) {
-      // console.log('saveUser: error saving userrrrrrrr');
-      // console.log(err);
 
       if(!err.exceptionInfo && err.message === 'User validation failed') {
-        // console.log('saveUser: creating custom error');
-
         var customError;
 
         var errMsg = Object.keys(err.errors).map(function (key) {
           return err.errors[key].message.replace(/Path /g, '').replace(/`/g, '');
         }).join('. ');
-        // console.log('errMsg');
-        // console.log(errMsg);
-
-        // console.log(errMsg);
         customError = exceptionMessages.createError('validation_failure', errMsg);
         customError.statusCode = 422; //422 Unprocessable Entity
-        // }
-
-        // console.log('throwing custom error');
-        // console.log(customError);
-        // console.log('Throwing custome error');
         throw customError;
       } else {
-        // console.log('unhandled error ');
         // not a validation error!
         throw err;
       }
@@ -141,7 +106,6 @@ module.exports = {
   Model: UserModel,
   get: get,
   getById: getById,
-  // getByUserNamePassword: getByUserNamePassword,
   create: create,
   deleteById: deleteById,
   update: update
